@@ -12,7 +12,7 @@ img_width, img_height = 64, 64  # You can adjust based on your dataset size
 
 # Path to your dataset
 train_dir = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_train'
-test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/A_test.jpg'  # Replace with the correct path to your test image
+test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/A/A_test.jpg'  # Replace with the correct path to your test image
 
 # ImageDataGenerator for data augmentation
 train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -58,14 +58,14 @@ for layer in base_model.layers:
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Set up EarlyStopping and ModelCheckpoint callbacks
-early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
-checkpoint = ModelCheckpoint('asl_sign_language_model.h5', save_best_only=True, save_weights_only=True)
+early_stop = EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=True)
+checkpoint = ModelCheckpoint('asl_sign_language_model_mobilenetv2.weights.h5', save_best_only=True, save_weights_only=True)
 
 # Train the model
 history = model.fit(
     train_generator,
     steps_per_epoch=train_generator.samples // train_generator.batch_size,
-    epochs=200,  # You can increase this for better accuracy
+    epochs=250,  # You can increase this for better accuracy
     validation_data=test_datagen.flow_from_directory(
         '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test',
         target_size=(img_width, img_height),

@@ -40,7 +40,7 @@ model = load_model()
 inv_class_labels = load_class_labels()
 
 # Path to the test image (update this with your own test image path)
-test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/A_test.jpg'  # Replace with your test image path
+test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/7/666ff78d-9d8e-44c2-9fa5-7cebab2e37d9.rgb_0000.png'  # Replace with your test image path
 
 # Predict the sign for the test image
 predicted_label = predict_sign_language(model, inv_class_labels, test_image_path)

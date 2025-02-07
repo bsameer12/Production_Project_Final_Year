@@ -65,7 +65,7 @@ for layer in base_model.layers:
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Set up EarlyStopping and ModelCheckpoint callbacks
-early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+early_stop = EarlyStopping(monitor='val_loss', patience=40, restore_best_weights=True)
 
 # Saving the entire model (architecture + weights + optimizer) during training
 checkpoint = ModelCheckpoint('asl_sign_language_resnet_model.h5', save_best_only=True, save_weights_only=False)
