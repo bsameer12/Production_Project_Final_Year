@@ -7,7 +7,7 @@ img_width, img_height = 64, 64  # You can adjust based on your dataset size
 
 # Path to your dataset
 train_dir = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_train'
-test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/A_test.jpg'  # Replace with the correct path to your test image
+test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/A/A_test.jpg'  # Replace with the correct path to your test image
 
 # ImageDataGenerator for data augmentation (helps improve model generalization)
 train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -59,7 +59,7 @@ model.summary()
 history = model.fit(
     train_generator,
     steps_per_epoch=train_generator.samples // train_generator.batch_size,
-    epochs=100,  # You can increase this for better accuracy
+    epochs=300,  # You can increase this for better accuracy
 )
 
 # Save the model after training
