@@ -6,7 +6,7 @@ import numpy as np
 loaded_model = tf.keras.models.load_model('asl_sign_language_model.h5')
 
 # Path to the test image
-test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/8/9b165e7c-b3ea-4571-b4ac-f2b19ec43fd5.rgb_0000.png'
+test_image_path = '../ASL(American_Sign_Language)_Alphabet_Dataset/ASL_Alphabet_Dataset/asl_alphabet_test/Z/Z_test.jpg'
 
 # Set image dimensions
 img_width, img_height = 64, 64  # You can adjust based on your dataset size
