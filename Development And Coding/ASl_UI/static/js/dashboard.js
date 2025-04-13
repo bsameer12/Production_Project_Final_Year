@@ -4,14 +4,12 @@ let landmarkQueue = [];
 let ttsEnabled = true;
 let hands = null;
 let camera = null;
-let handPreviouslyDetected = false; // Used to trigger sound only once
+let handPreviouslyDetected = false;
 
-// Toggle sidebar visibility
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("collapsed");
 }
 
-// Start camera and MediaPipe Hands
 async function startCamera() {
   const canvas = document.getElementById("webcam-canvas");
   const ctx = canvas.getContext("2d");
@@ -25,49 +23,56 @@ async function startCamera() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
-
     updateCameraStatus(true);
 
     hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
     });
 
     hands.setOptions({
       maxNumHands: 1,
       modelComplexity: 1,
       minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
+      minTrackingConfidence: 0.7
     });
 
-    hands.onResults((results) => {
+    hands.onResults(results => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
-      const landmarksDetected = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
+      const detected = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
 
-      // 🔔 Play sound once when hand is detected
-      if (landmarksDetected && !handPreviouslyDetected) {
+      if (!detected) {
+        if (handPreviouslyDetected) {
+          handPreviouslyDetected = false;
+          document.getElementById("feedbackBox").textContent = "Hand not detected.";
+          clearPrediction(); // Clear if hand disappears
+        }
+
+        // If predicting is off, show that too
+        if (!predicting) {
+          document.getElementById("feedbackBox").textContent = "Prediction Off";
+        }
+
+        return;
+      }
+
+      // Beep on first hand detection
+      if (!handPreviouslyDetected) {
         playBeep();
         handPreviouslyDetected = true;
         document.getElementById("feedbackBox").textContent = "Hand detected.";
       }
 
-      if (!landmarksDetected) {
-        handPreviouslyDetected = false;
-        document.getElementById("feedbackBox").textContent = "Hand not detected.";
-        return;
-      }
+      const landmarks = results.multiHandLandmarks[0];
+      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
+      drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 1 });
 
       if (predicting) {
-        const landmarks = results.multiHandLandmarks[0];
-        drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
-        drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 1 });
-
         const wrist = landmarks[0];
         const normed = landmarks.map(pt => [pt.x - wrist.x, pt.y - wrist.y, pt.z - wrist.z]);
-        const flat = normed.flat();
+        landmarkQueue.push(normed.flat());
 
-        landmarkQueue.push(flat);
         if (landmarkQueue.length === 10) {
           const sequence = [...landmarkQueue];
           landmarkQueue = [];
@@ -78,20 +83,24 @@ async function startCamera() {
               "Content-Type": "application/json",
               "X-CSRFToken": getCSRFToken()
             },
-            body: JSON.stringify({ sequence: sequence })
+            body: JSON.stringify({ sequence })
           })
             .then(res => res.json())
             .then(data => {
               if (data.error) {
-                document.getElementById("feedbackBox").textContent = "Prediction failed: " + data.error;
+                document.getElementById("feedbackBox").textContent = data.error;
                 return;
               }
 
               document.getElementById("prediction").textContent = data.label;
               document.getElementById("confidence").textContent = data.confidence;
-              document.getElementById("feedbackBox").textContent = `Prediction: ${data.label} (${data.confidence})`;
+              document.getElementById("top2").textContent = `${data.top2.label} (${data.top2.confidence})`;
+              document.getElementById("top3").textContent = `${data.top3.label} (${data.top3.confidence})`;
 
-              if (ttsEnabled && data.confidence > 0.7) {
+              document.getElementById("feedbackBox").textContent =
+                `Prediction: ${data.label} (${data.confidence})`;
+
+              if (ttsEnabled && data.confidence > 0.75) {
                 const utter = new SpeechSynthesisUtterance(data.label);
                 window.speechSynthesis.speak(utter);
               }
@@ -100,13 +109,13 @@ async function startCamera() {
               document.getElementById("feedbackBox").textContent = "Prediction error: " + err.message;
             });
         }
+      } else {
+        document.getElementById("feedbackBox").textContent = "Prediction Off";
       }
     });
 
     camera = new Camera(video, {
-      onFrame: async () => {
-        await hands.send({ image: video });
-      },
+      onFrame: async () => await hands.send({ image: video }),
       width: canvas.width,
       height: canvas.height
     });
@@ -114,15 +123,13 @@ async function startCamera() {
     camera.start();
   } catch (error) {
     alert("Webcam access denied.");
-    updateCameraStatus(false);
     console.error(error);
+    updateCameraStatus(false);
   }
 }
 
 function stopCamera() {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-  }
+  if (stream) stream.getTracks().forEach(track => track.stop());
   if (camera) camera.stop();
   updateCameraStatus(false);
   document.getElementById("feedbackBox").textContent = "Camera stopped.";
@@ -141,7 +148,8 @@ function stopPrediction() {
 function clearPrediction() {
   document.getElementById("prediction").textContent = "-";
   document.getElementById("confidence").textContent = "0.00";
-  document.getElementById("feedbackBox").textContent = "Prediction Cleared";
+  document.getElementById("top2").textContent = "-";
+  document.getElementById("top3").textContent = "-";
   landmarkQueue = [];
 }
 
@@ -152,26 +160,18 @@ function toggleTTS() {
 function updateCameraStatus(active) {
   const dot = document.getElementById("camera-dot");
   const text = document.getElementById("camera-status-text");
-  if (active) {
-    dot.classList.remove("red");
-    dot.classList.add("green");
-    text.textContent = "Camera started";
-  } else {
-    dot.classList.remove("green");
-    dot.classList.add("red");
-    text.textContent = "Camera stopped";
-  }
+  dot.className = "dot " + (active ? "green" : "red");
+  text.textContent = active ? "Camera started" : "Camera stopped";
 }
 
 function getCSRFToken() {
-  const cookieValue = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
+  const cookie = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
+  return cookie ? cookie.pop() : '';
 }
 
-// 🔔 Sound when hand is detected
 function playBeep() {
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
-  audio.play().catch(e => console.warn("Autoplay policy may block audio: ", e));
+  const beep = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+  beep.play().catch(e => console.warn("Autoplay policy prevented sound"));
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -27,6 +27,7 @@ def predict_dashboard(request):
     return render(request, "dashboard.html", {"user": request.user})
 
 # === AJAX Prediction Endpoint ===
+# === AJAX Prediction Endpoint ===
 @csrf_exempt
 @login_required
 def predict_landmarks(request):
@@ -40,12 +41,15 @@ def predict_landmarks(request):
 
             sequence = np.array(sequence).reshape(1, 10, -1)
             preds = model.predict(sequence, verbose=0)[0]
-            confidence = float(np.max(preds))
-            label = class_labels[int(np.argmax(preds))]
+
+            top3_indices = preds.argsort()[-3:][::-1]
+            top3 = [{"label": class_labels[i], "confidence": round(float(preds[i]), 2)} for i in top3_indices]
 
             return JsonResponse({
-                "label": label,
-                "confidence": round(confidence, 2)
+                "label": top3[0]["label"],
+                "confidence": top3[0]["confidence"],
+                "top2": top3[1],
+                "top3": top3[2]
             })
 
         except Exception as e:
