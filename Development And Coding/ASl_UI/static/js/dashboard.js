@@ -1,4 +1,4 @@
- let stream = null;
+let stream = null;
 let predicting = false;
 let landmarkQueue = [];
 let ttsEnabled = true;
@@ -42,7 +42,7 @@ async function startCamera() {
       ctx.save();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Mirror the canvas
+      // Mirror canvas
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
 
@@ -72,10 +72,13 @@ async function startCamera() {
       }
 
       const landmarks = results.multiHandLandmarks[0];
+
       drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
       drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 1 });
 
       ctx.restore();
+
+      updateLandmarkList(landmarks); // Show landmark values
 
       if (predicting) {
         const wrist = landmarks[0];
@@ -119,6 +122,8 @@ async function startCamera() {
 
               document.getElementById("feedbackBox").textContent =
                 `Prediction: ${data.label} (${data.confidence})`;
+
+              appendToHistory(data.label, data.confidence);
 
               if (ttsEnabled && data.confidence > 0.75 && data.label !== lastTTSLabel) {
                 const utter = new SpeechSynthesisUtterance(data.label);
@@ -173,6 +178,8 @@ function clearPrediction() {
   document.getElementById("top3").textContent = "-";
   landmarkQueue = [];
   lastPrediction = null;
+  document.getElementById("predictionHistory").innerHTML = "";
+  document.getElementById("landmarkPoints").innerHTML = "";
 }
 
 function toggleTTS() {
@@ -202,6 +209,23 @@ function arraysEqual(arr1, arr2) {
     if (Math.abs(arr1[i] - arr2[i]) > 0.0001) return false;
   }
   return true;
+}
+
+// 👇 Show live landmark points in a scrollable list
+function updateLandmarkList(landmarks) {
+  const container = document.getElementById("landmarkPoints");
+  container.innerHTML = landmarks.map((pt, i) =>
+    `<div>Point ${i}: x=${pt.x.toFixed(3)}, y=${pt.y.toFixed(3)}, z=${pt.z.toFixed(3)}</div>`
+  ).join("");
+}
+
+// 👇 Add to prediction history below
+function appendToHistory(label, confidence) {
+  const now = new Date();
+  const timestamp = now.toLocaleString();
+  const item = document.createElement("li");
+  item.textContent = `${timestamp} → ${label} (${confidence})`;
+  document.getElementById("predictionHistory").prepend(item);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
