@@ -21,4 +21,5 @@ from django.urls import path, include  # ✅ include was missing
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # ✅ Add this line
+    path('', include('asl.urls')),
 ]

@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASL Sign Translator</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <h1>ASL Sign Translator</h1>
+    <ul>
+      <li><a href="#"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li><a href="#"><i class="fas fa-user"></i><span>{{ user.username }}</span></a></li>
+      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <h2>Welcome, {{ user.first_name|default:user.username }}</h2>
+
+    <div class="video-prediction-container">
+      <div class="video-box">
+        <h3>Live Webcam Feed</h3>
+        <video id="webcam" autoplay playsinline></video>
+        <div class="camera-controls">
+          <button onclick="startCamera()">Start Camera</button>
+          <button onclick="stopCamera()">Stop Camera</button>
+        </div>
+        <div class="camera-status">
+          <span id="camera-dot" class="dot red"></span>
+          <span id="camera-status-text">Camera stopped</span>
+        </div>
+      </div>
+
+      <div class="prediction-box">
+        <h3>Prediction</h3>
+        <p><strong>Label:</strong> <span id="prediction">-</span></p>
+        <p><strong>Confidence:</strong> <span id="confidence">0.00</span></p>
+        <div class="controls">
+          <button onclick="startPrediction()">Start</button>
+          <button onclick="stopPrediction()">Stop</button>
+          <button onclick="clearPrediction()">Clear</button>
+          <label class="toggle-switch">
+            <input type="checkbox" id="ttsToggle" checked onchange="toggleTTS()">
+            <span class="slider"></span> TTS
+          </label>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>
