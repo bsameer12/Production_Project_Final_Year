@@ -5,6 +5,8 @@ let ttsEnabled = true;
 let hands = null;
 let camera = null;
 let handPreviouslyDetected = false;
+let lastPrediction = null;
+let lastTTSLabel = null;
 
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("collapsed");
@@ -46,18 +48,14 @@ async function startCamera() {
         if (handPreviouslyDetected) {
           handPreviouslyDetected = false;
           document.getElementById("feedbackBox").textContent = "Hand not detected.";
-          clearPrediction(); // Clear if hand disappears
+          clearPrediction();
         }
-
-        // If predicting is off, show that too
         if (!predicting) {
           document.getElementById("feedbackBox").textContent = "Prediction Off";
         }
-
         return;
       }
 
-      // Beep on first hand detection
       if (!handPreviouslyDetected) {
         playBeep();
         handPreviouslyDetected = true;
@@ -71,7 +69,12 @@ async function startCamera() {
       if (predicting) {
         const wrist = landmarks[0];
         const normed = landmarks.map(pt => [pt.x - wrist.x, pt.y - wrist.y, pt.z - wrist.z]);
-        landmarkQueue.push(normed.flat());
+        const flat = normed.flat();
+
+        // Compare with last frame in queue to avoid duplicates
+        if (landmarkQueue.length === 0 || !arraysEqual(flat, landmarkQueue[landmarkQueue.length - 1])) {
+          landmarkQueue.push(flat);
+        }
 
         if (landmarkQueue.length === 10) {
           const sequence = [...landmarkQueue];
@@ -92,6 +95,13 @@ async function startCamera() {
                 return;
               }
 
+              if (data.label === lastPrediction) {
+                document.getElementById("feedbackBox").textContent = "Prediction Paused: Same Gesture";
+                return;
+              }
+
+              lastPrediction = data.label;
+
               document.getElementById("prediction").textContent = data.label;
               document.getElementById("confidence").textContent = data.confidence;
               document.getElementById("top2").textContent = `${data.top2.label} (${data.top2.confidence})`;
@@ -100,9 +110,11 @@ async function startCamera() {
               document.getElementById("feedbackBox").textContent =
                 `Prediction: ${data.label} (${data.confidence})`;
 
-              if (ttsEnabled && data.confidence > 0.75) {
+              // Speak if confidence > 0.75 and different from last spoken
+              if (ttsEnabled && data.confidence > 0.75 && data.label !== lastTTSLabel) {
                 const utter = new SpeechSynthesisUtterance(data.label);
                 window.speechSynthesis.speak(utter);
+                lastTTSLabel = data.label;
               }
             })
             .catch(err => {
@@ -151,6 +163,7 @@ function clearPrediction() {
   document.getElementById("top2").textContent = "-";
   document.getElementById("top3").textContent = "-";
   landmarkQueue = [];
+  lastPrediction = null;
 }
 
 function toggleTTS() {
@@ -172,6 +185,14 @@ function getCSRFToken() {
 function playBeep() {
   const beep = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
   beep.play().catch(e => console.warn("Autoplay policy prevented sound"));
+}
+
+function arraysEqual(arr1, arr2) {
+  if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
+  for (let i = 0; i < arr1.length; i++) {
+    if (Math.abs(arr1[i] - arr2[i]) > 0.0001) return false;
+  }
+  return true;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
