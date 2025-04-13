@@ -7,6 +7,7 @@ let camera = null;
 let handPreviouslyDetected = false;
 let lastPrediction = null;
 let lastTTSLabel = null;
+let cooldown = false;
 
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("collapsed");
@@ -45,7 +46,6 @@ async function startCamera() {
       // Mirror canvas
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
-
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
       const detected = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
@@ -56,11 +56,9 @@ async function startCamera() {
           document.getElementById("feedbackBox").textContent = "Hand not detected.";
           clearPrediction();
         }
-
         if (!predicting) {
           document.getElementById("feedbackBox").textContent = "Prediction Off";
         }
-
         ctx.restore();
         return;
       }
@@ -69,18 +67,17 @@ async function startCamera() {
         playBeep();
         handPreviouslyDetected = true;
         document.getElementById("feedbackBox").textContent = "Hand detected.";
+        startCooldown(); // Trigger cooldown when hand appears
       }
 
       const landmarks = results.multiHandLandmarks[0];
-
       drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
       drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 1 });
-
       ctx.restore();
 
-      updateLandmarkList(landmarks); // Show landmark values
+      updateLandmarkList(landmarks);
 
-      if (predicting) {
+      if (predicting && !cooldown) {
         const wrist = landmarks[0];
         const normed = landmarks.map(pt => [pt.x - wrist.x, pt.y - wrist.y, pt.z - wrist.z]);
         const flat = normed.flat();
@@ -92,6 +89,8 @@ async function startCamera() {
         if (landmarkQueue.length === 10) {
           const sequence = [...landmarkQueue];
           landmarkQueue = [];
+
+          startCooldown(); // Cooldown after prediction too
 
           fetch("/predict_landmarks/", {
             method: "POST",
@@ -135,7 +134,7 @@ async function startCamera() {
               document.getElementById("feedbackBox").textContent = "Prediction error: " + err.message;
             });
         }
-      } else {
+      } else if (!predicting) {
         document.getElementById("feedbackBox").textContent = "Prediction Off";
       }
     });
@@ -164,6 +163,7 @@ function stopCamera() {
 function startPrediction() {
   predicting = true;
   document.getElementById("feedbackBox").textContent = "Prediction Running...";
+  startCooldown(); // Trigger cooldown after resume
 }
 
 function stopPrediction() {
@@ -209,6 +209,14 @@ function arraysEqual(arr1, arr2) {
     if (Math.abs(arr1[i] - arr2[i]) > 0.0001) return false;
   }
   return true;
+}
+
+// 👇 Add 5-second cooldown to prevent frequent predictions
+function startCooldown() {
+  cooldown = true;
+  setTimeout(() => {
+    cooldown = false;
+  }, 5000);
 }
 
 // 👇 Show live landmark points in a scrollable list
