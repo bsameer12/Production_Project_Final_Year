@@ -6,6 +6,8 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from tensorflow.keras.models import load_model
+from .models import ASLPrediction
+from django.utils.timezone import now
 
 # === Load your model once globally ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,11 +41,23 @@ def predict_landmarks(request):
             if not sequence or len(sequence) != 10:
                 return JsonResponse({"error": "Invalid input. Sequence must contain 10 frames."}, status=400)
 
-            sequence = np.array(sequence).reshape(1, 10, -1)
-            preds = model.predict(sequence, verbose=0)[0]
+            sequence_np = np.array(sequence).reshape(1, 10, -1)
+            preds = model.predict(sequence_np, verbose=0)[0]
 
             top3_indices = preds.argsort()[-3:][::-1]
             top3 = [{"label": class_labels[i], "confidence": round(float(preds[i]), 2)} for i in top3_indices]
+
+            # Save to DB
+            ASLPrediction.objects.create(
+                user=request.user,
+                input_sequence=sequence,
+                top1_label=top3[0]["label"],
+                top1_confidence=top3[0]["confidence"],
+                top2_label=top3[1]["label"],
+                top2_confidence=top3[1]["confidence"],
+                top3_label=top3[2]["label"],
+                top3_confidence=top3[2]["confidence"],
+            )
 
             return JsonResponse({
                 "label": top3[0]["label"],
