@@ -7,14 +7,17 @@
   <title>ASL Sign Translator</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 </head>
 <body>
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-    <h1>ASL Sign Translator</h1>
+    <h1>
+     <button class="mobile-sidebar-close"  onclick="toggleSidebar()"   style="font-size: 1.8rem; background: none; border: none; color: white; cursor: pointer; margin-right: 25px; ">☰</button>
+      ASL Sign Translator</h1>
     <ul>
       <li><a href="#"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
       <li><a href="#"><i class="fas fa-user"></i><span>{{ user.username }}</span></a></li>
@@ -22,52 +25,75 @@
     </ul>
   </aside>
 
-  <main class="main-content">
-    <h2>Welcome, {{ user.first_name|default:user.username }}</h2>
+  <!-- Page Content -->
+  <div class="content-area">
+    <header class="page-header">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <h2>Welcome, {{ user.first_name|default:user.username }}</h2>
+    </header>
 
-    <div class="video-prediction-container">
-      <div class="video-box">
-        <h3>Live Webcam Feed</h3>
-        <canvas id="webcam-canvas" width="640" height="480"></canvas>
-        <div class="camera-controls">
-          <button onclick="startCamera()">Start Camera</button>
-          <button onclick="stopCamera()">Stop Camera</button>
+    <main class="main-content" id="mainContent">
+      <!-- Webcam + Prediction -->
+      <div class="video-prediction-container">
+        <!-- Webcam -->
+        <div class="video-box">
+          <h3>Live Webcam Feed</h3>
+          <canvas id="webcam-canvas" width="640" height="480"></canvas>
+          <div class="camera-controls">
+            <button onclick="startCamera()">Start Camera</button>
+            <button onclick="stopCamera()">Stop Camera</button>
+          </div>
+          <div class="camera-status">
+            <span id="camera-dot" class="dot red"></span>
+            <span id="camera-status-text">Camera stopped</span>
+          </div>
         </div>
-        <div class="camera-status">
-          <span id="camera-dot" class="dot red"></span>
-          <span id="camera-status-text">Camera stopped</span>
+
+        <!-- Prediction -->
+        <div class="prediction-box">
+          <h3>Prediction</h3>
+          <p><strong>Top 1:</strong> <span id="prediction">-</span> <span id="confidence">0.00</span></p>
+          <p><strong>Top 2:</strong> <span id="top2">-</span></p>
+          <p><strong>Top 3:</strong> <span id="top3">-</span></p>
+
+          <div class="controls">
+            <button onclick="startPrediction()">Start</button>
+            <button onclick="stopPrediction()">Stop</button>
+            <button onclick="clearPrediction()">Clear</button>
+            <label class="toggle-switch">
+              <input type="checkbox" id="ttsToggle" checked onchange="toggleTTS()">
+              <span class="slider"></span> TTS
+            </label>
+          </div>
+
+          <div id="feedbackBox" class="feedback-box">Prediction Paused</div>
+
+          <div class="landmark-list">
+            <h4>Landmark Points (x, y, z)</h4>
+            <div id="landmarkPoints" class="landmark-values"></div>
+          </div>
+
+          <div class="history-box">
+            <h4>Prediction History</h4>
+            <ul id="predictionHistory" class="history-list"></ul>
+          </div>
         </div>
       </div>
 
-      <div class="prediction-box">
-        <h3>Prediction</h3>
-        <p><strong>Top 1:</strong> <span id="prediction">-</span> <span id="confidence">0.00</span></p>
-        <p><strong>Top 2:</strong> <span id="top2">-</span></p>
-        <p><strong>Top 3:</strong> <span id="top3">-</span></p>
-        <div class="controls">
-          <button onclick="startPrediction()">Start</button>
-          <button onclick="stopPrediction()">Stop</button>
-          <button onclick="clearPrediction()">Clear</button>
-          <label class="toggle-switch">
-            <input type="checkbox" id="ttsToggle" checked onchange="toggleTTS()">
-            <span class="slider"></span> TTS
-          </label>
+      <!-- Graph Section -->
+      <div class="visualization-section">
+        <div class="bar-graph-container">
+          <h3>Top 3 Prediction Confidence</h3>
+          <canvas id="predictionBarChart"></canvas>
         </div>
-        <div id="feedbackBox" class="feedback-box">Prediction Paused</div>
-
-        <div class="landmark-list">
-          <h4>Landmark Points (x, y, z)</h4>
-          <div id="landmarkPoints" class="landmark-values"></div>
-        </div>
-
-        <div class="history-box">
-          <h4>Prediction History</h4>
-          <ul id="predictionHistory" class="history-list"></ul>
+        <div class="scatter-graph-container">
+          <h3>Hand Landmark Plot</h3>
+          <canvas id="landmarkScatterChart"></canvas>
         </div>
       </div>
-    </div>
-  </main>
-
+    </main>
+  </div>
   <script src="{% static 'js/dashboard.js' %}"></script>
 </body>
 </html>
+
