@@ -7,6 +7,11 @@
   <title>ASL Sign Translator</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <!-- MediaPipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 </head>
 <body>
   <aside class="sidebar" id="sidebar">
@@ -25,7 +30,7 @@
     <div class="video-prediction-container">
       <div class="video-box">
         <h3>Live Webcam Feed</h3>
-        <video id="webcam" autoplay playsinline></video>
+        <canvas id="webcam-canvas" width="640" height="480"></canvas>
         <div class="camera-controls">
           <button onclick="startCamera()">Start Camera</button>
           <button onclick="stopCamera()">Stop Camera</button>
@@ -49,6 +54,7 @@
             <span class="slider"></span> TTS
           </label>
         </div>
+        <div id="feedbackBox" class="feedback-box">Prediction Paused</div>
       </div>
     </div>
   </main>

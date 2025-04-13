@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",   # Your login/register app
     "asl",        # Your ASL model and prediction app
+
 ]
 
 MIDDLEWARE = [
@@ -93,3 +94,9 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+INSTALLED_APPS += ['corsheaders']
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+CORS_ALLOW_ALL_ORIGINS = True
+
