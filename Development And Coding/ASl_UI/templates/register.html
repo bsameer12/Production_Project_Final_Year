@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | ASL Recognition</title>
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <form method="post" class="register-card" id="registerForm" novalidate>
+      {% csrf_token %}
+      <h2><i class="fas fa-user-plus"></i> Register</h2>
+      {{ form.non_field_errors }}
+
+      <div class="floating-label-group">
+        {{ form.username }}
+        <label for="id_username">Username</label>
+        <i class="fas fa-user icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <div class="floating-label-group">
+        {{ form.password1 }}
+        <label for="id_password1">Password</label>
+        <i class="fas fa-lock icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <div class="floating-label-group">
+        {{ form.password2 }}
+        <label for="id_password2">Confirm Password</label>
+        <i class="fas fa-lock icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <button type="submit" id="registerBtn">Register</button>
+      <div id="loader" class="loader" style="display: none;"></div>
+      <p class="redirect-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </form>
+  </div>
+
+  <script src="{% static 'js/register.js' %}"></script>
+</body>
+</html>

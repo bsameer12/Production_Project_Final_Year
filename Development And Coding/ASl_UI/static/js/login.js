@@ -1,0 +1,41 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("loginForm");
+    const inputs = form.querySelectorAll("input");
+    const loader = document.getElementById("loader");
+    const loginBtn = document.getElementById("loginBtn");
+
+    inputs.forEach(input => {
+        input.addEventListener("input", () => validateField(input));
+    });
+
+    form.addEventListener("submit", (e) => {
+        let valid = true;
+        inputs.forEach(input => {
+            if (!validateField(input)) valid = false;
+        });
+
+        if (!valid) {
+            e.preventDefault();
+        } else {
+            loginBtn.style.display = "none";
+            loader.style.display = "block";
+        }
+    });
+
+    function validateField(input) {
+        const error = input.parentElement.querySelector(".error");
+        if (input.value.trim() === "") {
+            input.classList.remove("valid");
+            input.classList.add("invalid");
+            error.textContent = `${input.previousElementSibling.innerText} is required`;
+            error.style.display = "block";
+            return false;
+        } else {
+            input.classList.remove("invalid");
+            input.classList.add("valid");
+            error.textContent = "";
+            error.style.display = "none";
+            return true;
+        }
+    }
+});
