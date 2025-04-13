@@ -1,4 +1,4 @@
-let stream = null;
+ let stream = null;
 let predicting = false;
 let landmarkQueue = [];
 let ttsEnabled = true;
@@ -39,7 +39,13 @@ async function startCamera() {
     });
 
     hands.onResults(results => {
+      ctx.save();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Mirror the canvas
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
       const detected = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
@@ -50,9 +56,12 @@ async function startCamera() {
           document.getElementById("feedbackBox").textContent = "Hand not detected.";
           clearPrediction();
         }
+
         if (!predicting) {
           document.getElementById("feedbackBox").textContent = "Prediction Off";
         }
+
+        ctx.restore();
         return;
       }
 
@@ -66,12 +75,13 @@ async function startCamera() {
       drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
       drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 1 });
 
+      ctx.restore();
+
       if (predicting) {
         const wrist = landmarks[0];
         const normed = landmarks.map(pt => [pt.x - wrist.x, pt.y - wrist.y, pt.z - wrist.z]);
         const flat = normed.flat();
 
-        // Compare with last frame in queue to avoid duplicates
         if (landmarkQueue.length === 0 || !arraysEqual(flat, landmarkQueue[landmarkQueue.length - 1])) {
           landmarkQueue.push(flat);
         }
@@ -110,7 +120,6 @@ async function startCamera() {
               document.getElementById("feedbackBox").textContent =
                 `Prediction: ${data.label} (${data.confidence})`;
 
-              // Speak if confidence > 0.75 and different from last spoken
               if (ttsEnabled && data.confidence > 0.75 && data.label !== lastTTSLabel) {
                 const utter = new SpeechSynthesisUtterance(data.label);
                 window.speechSynthesis.speak(utter);
