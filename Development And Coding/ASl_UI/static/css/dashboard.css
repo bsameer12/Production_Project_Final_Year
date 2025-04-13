@@ -344,3 +344,55 @@ html, body {
 }
 
 
+/* Profile layout (default/full) */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: transparent;
+  color: white;
+  white-space: nowrap;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Username text */
+.sidebar-username {
+  font-size: 1rem;
+  font-weight: 500;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Collapsed: Only show avatar, hide username */
+.sidebar.collapsed .sidebar-profile {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-username {
+  display: none !important;
+
+}
+
+.sidebar.collapsed .sidebar-profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0;
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: inherit;
+  white-space: nowrap;
+}
+
+
+

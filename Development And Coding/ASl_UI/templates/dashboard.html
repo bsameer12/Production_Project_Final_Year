@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASL Sign Translator</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
@@ -18,11 +18,18 @@
     <h1>
      <button class="mobile-sidebar-close"  onclick="toggleSidebar()"   style="font-size: 1.8rem; background: none; border: none; color: white; cursor: pointer; margin-right: 25px; ">☰</button>
       ASL Sign Translator</h1>
+     <!-- Profile Section -->
+ <div class="sidebar-profile">
+  <img src="{% static 'images/user.png' %}" alt="Profile" class="sidebar-avatar">
+  <span class="sidebar-username">{{ user.first_name|default:user.username }}</span>
+</div>
+
+
     <ul>
-      <li><a href="#"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-      <li><a href="#"><i class="fas fa-user"></i><span>{{ user.username }}</span></a></li>
-      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
-    </ul>
+    <li><a href="#"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
+    <li><a href="#"><i class="fas fa-user"></i><span>Profile</span></a></li>
+    <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+  </ul>
   </aside>
 
   <!-- Page Content -->
