@@ -1,3 +1,4 @@
+// ASL Dashboard Enhanced JS with XY, XZ, and YZ scatter charts
 let stream = null;
 let predicting = false;
 let landmarkQueue = [];
@@ -9,8 +10,9 @@ let handPreviouslyDetected = false;
 let lastPrediction = null;
 let lastTTSLabel = null;
 
-let predictionChart, scatterChart;
-let predictionSequence = []; // store top-1 predictions
+let predictionChart;
+let scatterChartXY, scatterChartXZ, scatterChartYZ;
+let predictionSequence = [];
 
 function appendToHistory(label, confidence) {
   predictionSequence.push(label);
@@ -19,7 +21,6 @@ function appendToHistory(label, confidence) {
   item.textContent = `${new Date().toLocaleString()} → ${label} (${confidence})`;
   document.getElementById("predictionHistory").prepend(item);
 
-  // Live output preview
   document.getElementById("sentence-output").value = predictionSequence.join('');
 }
 
@@ -55,7 +56,9 @@ function updateLandmarkList(landmarks) {
   document.getElementById("landmarkPoints").innerHTML = landmarks.map(
     (pt, i) => `<div>Point ${i}: x=${pt.x.toFixed(3)}, y=${pt.y.toFixed(3)}, z=${pt.z.toFixed(3)}</div>`
   ).join("");
-  updateScatterChart(landmarks);
+  updateScatterChartXY(landmarks);
+  updateScatterChartXZ(landmarks);
+  updateScatterChartYZ(landmarks);
 }
 
 function clearPrediction() {
@@ -80,7 +83,7 @@ function startPrediction() {
 }
 
 function stopPrediction() {
- console.log("🛑 stopPrediction() triggered");
+  console.log("🛑 stopPrediction() triggered");
   predicting = false;
   document.getElementById("feedbackBox").textContent = "Prediction Paused.";
 
@@ -122,7 +125,6 @@ function stopPrediction() {
   }
 }
 
-
 function toggleTTS() {
   ttsEnabled = document.getElementById("ttsToggle").checked;
 }
@@ -138,16 +140,8 @@ async function startCamera() {
     video.srcObject = stream;
     updateCameraStatus(true);
 
-    hands = new Hands({
-      locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-    });
-
-    hands.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7
-    });
+    hands = new Hands({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
 
     hands.onResults(results => {
       ctx.save();
@@ -193,23 +187,13 @@ async function startCamera() {
 
           fetch("/predict_landmarks/", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCSRFToken()
-            },
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
             body: JSON.stringify({ sequence })
           })
           .then(r => r.json())
           .then(data => {
-            if (data.error) {
-              document.getElementById("feedbackBox").textContent = data.error;
-              return;
-            }
-
-            if (data.label === lastPrediction) {
-              document.getElementById("feedbackBox").textContent = "Prediction Paused: Same Gesture";
-              return;
-            }
+            if (data.error) return (document.getElementById("feedbackBox").textContent = data.error);
+            if (data.label === lastPrediction) return (document.getElementById("feedbackBox").textContent = "Prediction Paused: Same Gesture");
 
             lastPrediction = data.label;
             document.getElementById("prediction").textContent = data.label;
@@ -249,16 +233,9 @@ function initPredictionChart() {
     type: 'bar',
     data: {
       labels: ['Top 1', 'Top 2', 'Top 3'],
-      datasets: [{
-        label: 'Confidence',
-        backgroundColor: ['#007bff', '#28a745', '#ffc107'],
-        data: [0, 0, 0]
-      }]
+      datasets: [{ label: 'Confidence', backgroundColor: ['#007bff', '#28a745', '#ffc107'], data: [0, 0, 0] }]
     },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true, max: 1 } }
-    }
+    options: { responsive: true, scales: { y: { beginAtZero: true, max: 1 } } }
   });
 }
 
@@ -268,24 +245,46 @@ function updatePredictionChart(data) {
   predictionChart.update();
 }
 
-function initScatterChart() {
+function initScatterChartXY() {
   const ctx = document.getElementById('landmarkScatterChart').getContext('2d');
-  scatterChart = new Chart(ctx, {
+  scatterChartXY = new Chart(ctx, {
     type: 'scatter',
     data: { datasets: [{ label: 'Landmark (x, y)', data: [], backgroundColor: 'red' }] },
-    options: {
-      responsive: true,
-      scales: {
-        x: { type: 'linear', min: 0, max: 1 },
-        y: { type: 'linear', min: 0, max: 1 }
-      }
-    }
+    options: { responsive: true, scales: { x: { min: 0, max: 1 }, y: { min: 0, max: 1 } } }
   });
 }
 
-function updateScatterChart(landmarks) {
-  scatterChart.data.datasets[0].data = landmarks.map(pt => ({ x: pt.x, y: pt.y }));
-  scatterChart.update();
+function initScatterChartXZ() {
+  const ctx = document.getElementById('landmarkScatterChart_xz').getContext('2d');
+  scatterChartXZ = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets: [{ label: 'Landmark (x, z)', data: [], backgroundColor: 'blue' }] },
+    options: { responsive: true, scales: { x: { min: 0, max: 1 }, y: { min: -0.5, max: 0.5 } } }
+  });
+}
+
+function initScatterChartYZ() {
+  const ctx = document.getElementById('landmarkScatterChart_yz').getContext('2d');
+  scatterChartYZ = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets: [{ label: 'Landmark (y, z)', data: [], backgroundColor: 'green' }] },
+    options: { responsive: true, scales: { x: { min: 0, max: 1 }, y: { min: -0.5, max: 0.5 } } }
+  });
+}
+
+function updateScatterChartXY(landmarks) {
+  scatterChartXY.data.datasets[0].data = landmarks.map(pt => ({ x: pt.x, y: pt.y }));
+  scatterChartXY.update();
+}
+
+function updateScatterChartXZ(landmarks) {
+  scatterChartXZ.data.datasets[0].data = landmarks.map(pt => ({ x: pt.x, y: pt.z }));
+  scatterChartXZ.update();
+}
+
+function updateScatterChartYZ(landmarks) {
+  scatterChartYZ.data.datasets[0].data = landmarks.map(pt => ({ x: pt.y, y: pt.z }));
+  scatterChartYZ.update();
 }
 
 function stopCamera() {
@@ -298,5 +297,8 @@ function stopCamera() {
 document.addEventListener("DOMContentLoaded", () => {
   updateCameraStatus(false);
   initPredictionChart();
-  initScatterChart();
+  initScatterChartXY();
+  initScatterChartXZ();
+  initScatterChartYZ();
 });
+

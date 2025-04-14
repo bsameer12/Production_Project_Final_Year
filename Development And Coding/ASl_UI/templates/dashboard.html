@@ -48,9 +48,9 @@
         <!-- Prediction -->
         <div class="prediction-box">
           <h3>Prediction</h3>
-          <p><strong>Top 1:</strong> <span id="prediction">-</span> <span id="confidence">0.00</span></p>
-          <p><strong>Top 2:</strong> <span id="top2">-</span></p>
-          <p><strong>Top 3:</strong> <span id="top3">-</span></p>
+          <p style="margin-top:25px;"><strong>Top 1:</strong> <span id="prediction">-</span> <span id="confidence">0.00</span></p>
+          <p style="margin-top:25px;"><strong>Top 2:</strong> <span id="top2">-</span></p>
+          <p style="margin-top:25px;"><strong>Top 3:</strong> <span id="top3">-</span></p>
 
           <div class="controls">
             <button onclick="startPrediction()">Start</button>
@@ -64,15 +64,19 @@
 
           <div id="feedbackBox" class="feedback-box">Prediction Paused</div>
 
-          <div class="landmark-list">
+          <div class="landmark-list" style="margin-top:25px;">
             <h4>Landmark Points (x, y, z)</h4>
             <div id="landmarkPoints" class="landmark-values"></div>
           </div>
 
-          <div class="history-box">
+          <div class="history-box" style="margin-top:25px;">
             <h4>Prediction History</h4>
             <ul id="predictionHistory" class="history-list"></ul>
           </div>
+           <div class="scatter-graph-container" style="margin-top:25px;">
+          <h3>Hand Landmark Plot</h3>
+          <canvas id="landmarkScatterChart"></canvas>
+        </div>
         </div>
       </div>
 
@@ -84,7 +88,11 @@
         </div>
         <div class="scatter-graph-container">
           <h3>Hand Landmark Plot</h3>
-          <canvas id="landmarkScatterChart"></canvas>
+          <canvas id="landmarkScatterChart_xz"></canvas>
+        </div>
+        <div class="scatter-graph-container">
+          <h3>Hand Landmark Plot</h3>
+          <canvas id="landmarkScatterChart_yz"></canvas>
         </div>
       </div>
     </main>
