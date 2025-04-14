@@ -290,3 +290,8 @@ def generate_asl_video(request):
         return JsonResponse({"video_url": video_url})
 
     return render(request, 'asl_to_video.html')
+
+
+@login_required
+def english_to_asl_view(request):
+    return render(request, "english_to_asl.html")
