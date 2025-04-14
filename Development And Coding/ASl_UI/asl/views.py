@@ -73,9 +73,17 @@ def generate_sentence_view(request):
 
 @login_required
 def prediction_history_view(request):
-    predictions = ASLPrediction.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'prediction_history.html', {'predictions': predictions})
+    # 📘 Log user activity
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Prediction History page"
+    )
 
+    # 📄 Fetch predictions
+    predictions = ASLPrediction.objects.filter(user=request.user).order_by('-created_at')
+
+    return render(request, 'prediction_history.html', {'predictions': predictions})
 
 # === Load your model once globally ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
