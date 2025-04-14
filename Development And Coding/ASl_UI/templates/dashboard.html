@@ -20,8 +20,8 @@
       ASL Sign Translator</h1>
      <!-- Profile Section -->
  <div class="sidebar-profile">
-  <img src="{% static 'images/user.png' %}" alt="Profile" class="sidebar-avatar">
-  <span class="sidebar-username">{{ user.first_name|default:user.username }}</span>
+<img src="{{ user.profile.profile_image.url|default:'/static/images/user.png' }}" alt="Profile" class="sidebar-avatar">
+<span class="sidebar-username">{{ user.first_name }} {{ user.last_name }}</span>
 </div>
 
 
