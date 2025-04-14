@@ -54,6 +54,13 @@ def generate_sentence_view(request):
                 generated_sentence=sentence
             )
 
+            # 🕵️ Log user activity
+            log_user_activity(
+                request,
+                action="Sentence Generation",
+                description=f"Input: {combined} → Output: {sentence}"
+            )
+
             return JsonResponse({"sentence": sentence})
 
         except Exception as e:
