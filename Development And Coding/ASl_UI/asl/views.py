@@ -10,6 +10,7 @@ from .models import ASLPrediction
 from django.utils.timezone import now
 from .utils import log_user_activity
 
+
 # === Load your model once globally ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'asl_landmark_lstm_model.keras')
@@ -28,6 +29,9 @@ class_labels = {i: label for i, label in enumerate(label_map)}
 @login_required
 def predict_dashboard(request):
     return render(request, "dashboard.html", {"user": request.user})
+
+
+
 
 # === AJAX Prediction Endpoint ===
 # === AJAX Prediction Endpoint ===

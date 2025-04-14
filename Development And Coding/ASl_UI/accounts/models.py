@@ -4,7 +4,7 @@ import uuid
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='images/', default='images/user.png')
+    profile_picture = models.ImageField(upload_to='profile_images/', default='profile_images/user.png')
     contact_number = models.CharField(max_length=15, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     email_token = models.UUIDField(default=uuid.uuid4)

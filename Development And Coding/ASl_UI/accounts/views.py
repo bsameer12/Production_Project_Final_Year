@@ -8,6 +8,37 @@ from .models import Profile
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Profile
+
+@login_required
+def profile_view(request):
+    user = request.user
+
+    # Ensure profile exists
+    if not hasattr(user, 'profile'):
+        Profile.objects.create(user=user)
+
+    profile = user.profile
+
+    if request.method == 'POST':
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.save()
+
+        profile.contact_number = request.POST.get('contact')
+
+        if request.FILES.get('profile_picture'):
+            profile.profile_picture = request.FILES.get('profile_picture')
+            print("✅ Received profile_picture:", profile.profile_picture)
+
+        profile.save()  # ✅ don't skip this
+
+        return redirect('profile')
+
+    return render(request, 'profile.html', {'user': user, 'profile': profile})
+
 
 def register_view(request):
     if request.method == 'POST':

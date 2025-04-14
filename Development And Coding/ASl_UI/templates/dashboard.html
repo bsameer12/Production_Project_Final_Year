@@ -20,14 +20,14 @@
       ASL Sign Translator</h1>
      <!-- Profile Section -->
  <div class="sidebar-profile">
-<img src="{{ user.profile.profile_image.url|default:'/static/images/user.png' }}" alt="Profile" class="sidebar-avatar">
+<img src="{{ user.profile.profile_picture.url|default:'/media/profile_images/user.png' }}" alt="Profile" class="sidebar-avatar">
 <span class="sidebar-username">{{ user.first_name }} {{ user.last_name }}</span>
 </div>
 
 
     <ul>
-    <li><a href="#"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
-    <li><a href="#"><i class="fas fa-user"></i><span>Profile</span></a></li>
+    <li><a href="{% url 'predict' %}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
+    <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i><span>Profile</span></a></li>
     <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
   </ul>
   </aside>

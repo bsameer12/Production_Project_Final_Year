@@ -19,9 +19,14 @@ from django.urls import path
 from django.urls import path, include  # ✅ include was missing
 from django.conf import settings
 from django.conf.urls.static import static
+from accounts import views as account_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # ✅ Add this line
     path('', include('asl.urls')),
+    path('profile/', account_views.profile_view, name='profile'),
+    path('accounts/', include('django.contrib.auth.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

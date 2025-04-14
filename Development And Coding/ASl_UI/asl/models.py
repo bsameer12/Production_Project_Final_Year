@@ -26,3 +26,5 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.action} at {self.timestamp}"
+
+
