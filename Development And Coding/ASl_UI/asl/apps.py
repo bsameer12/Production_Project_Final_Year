@@ -6,4 +6,4 @@ class AslConfig(AppConfig):
     name = "asl"
 
     def ready(self):
-        import asl.signals 
+        import asl.signals
