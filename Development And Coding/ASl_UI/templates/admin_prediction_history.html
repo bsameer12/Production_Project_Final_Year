@@ -40,7 +40,7 @@
   <div class="content-area">
       <header class="page-header">
       <h2><button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
-      Prediction History</h2>
+      User Prediction History</h2>
     </header>
   <div class="table-container">
     <form method="get" class="filters">
@@ -69,6 +69,7 @@
     <table id="predictionTable">
       <thead>
         <tr>
+            <th>User</th>
           <th>Date</th>
           <th>Top 1</th>
           <th>Confidence</th>
@@ -81,6 +82,7 @@
       <tbody>
         {% for prediction in predictions %}
         <tr>
+            <td data-label="User">{{ prediction.user.first_name }} {{ prediction.user.last_name }}</td>
           <td data-label="Date">{{ prediction.created_at|date:"Y-m-d H:i" }}</td>
           <td data-label="Top 1">{{ prediction.top1_label }}</td>
           <td data-label="Conf.">{{ prediction.top1_confidence }}</td>

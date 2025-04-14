@@ -30,6 +30,11 @@
     <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i><span>Profile</span></a></li>
       <li><a href="{% url 'prediction_history' %}"><i class="fas fa-chart-line"></i><span>Prediction History</span></a></li>
       <li><a href="{% url 'user_history' %}"><i class="fas fa-history"></i><span>User History</span></a></li>
+      {% if user.is_superuser %}
+<li><a href="{% url 'admin_prediction_history' %}">
+  <i class="fas fa-users"></i><span>Users Prediction History</span></a>
+</li>
+{% endif %}
     <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
   </ul>
   </aside>
@@ -38,7 +43,7 @@
   <div class="content-area">
     <header class="page-header">
       <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
-      <h2>Welcome, {{ user.first_name|default:user.username }}</h2>
+      <h2>Prediction Dashboard</h2>
     </header>
 
     <main class="main-content" id="mainContent">

@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import ASLPrediction
 from .models import AuditLog
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def prediction_history_view(request):
@@ -100,3 +101,13 @@ def predict_landmarks(request):
 def user_history_view(request):
     audit_logs = AuditLog.objects.filter(user=request.user).order_by('-timestamp')
     return render(request, 'user_history.html', {'predictions': audit_logs})
+
+
+@login_required
+def admin_prediction_history_view(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied("You do not have permission to view this page.")
+
+    predictions = ASLPrediction.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
+
+    return render(request, 'admin_prediction_history.html', {'predictions': predictions})
