@@ -20,9 +20,11 @@ from django.urls import path, include  # ✅ include was missing
 from django.conf import settings
 from django.conf.urls.static import static
 from accounts import views as account_views
+from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),  # ✅ Add this line
     path('', include('asl.urls')),

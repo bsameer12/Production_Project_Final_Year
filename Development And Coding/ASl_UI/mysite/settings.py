@@ -120,5 +120,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 GEMINI_API_KEY = "AIzaSyCGjlcMhMR637L69s5GvVpFhQNdgi_a0ek"
 
+LOGIN_REDIRECT_URL = '/dashboard/'   # or wherever you want to land after login
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # optional but useful
+
+
 
 
