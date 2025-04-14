@@ -105,3 +105,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # or your provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "hudderfoods@gmail.com"
+EMAIL_HOST_PASSWORD = "ducm qeli ilzi khjb"  # Use App Password if 2FA enabled
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
