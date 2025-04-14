@@ -6,36 +6,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>English To ASL</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+   #form-area {
+      width: 100%;
+      padding: 2rem;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 120px;
+      background: #fefefe;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+      padding: 12px 24px;
+      background: #007bff;
+      color: #fff;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: #0056b3;
+    }
+
+    #previewSection {
+      margin-top: 2rem;
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.04);
+    }
+
+    #aslPreview {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    #downloadLink {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    #downloadLink:hover {
+      background: #218838;
+    }
+
+    @media (max-width: 768px) {
+      #form-area {
+        padding: 1rem;
+      }
+
+      button[type="submit"],
+      #downloadLink {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Sidebar -->
+
   {% include 'partials/sidebar.html' %}
-
-
-  <!-- Page Content -->
   <div class="content-area">
       <header class="page-header">
       <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
       <h2>English To ASL Dashboard</h2>
     </header>
+  <div id="form-area">
     <form id="aslForm">
-    {% csrf_token %}
-    <textarea name="text" id="text" rows="4" cols="50" placeholder="Type English text..."></textarea><br><br>
-    <button type="submit">Generate</button>
-  </form>
+      {% csrf_token %}
+      <label for="text">Enter English text:</label>
+      <textarea name="text" id="text" placeholder="Type something..."></textarea>
+      <button type="submit">Generate ASL Video</button>
+    </form>
 
-  <div id="previewSection" style="display:none;">
-    <h3>Preview:</h3>
-    <video id="aslPreview" width="400" controls></video>
-    <br><a id="downloadLink" href="#" download>Download Video</a>
+    <div id="previewSection" style="display:none;">
+      <h3>Video Preview</h3>
+      <video id="aslPreview" controls></video><br>
+      <a id="downloadLink" href="#" download>Download ASL Video</a>
+    </div>
   </div>
   </div>
-<script>
+
+  <script>
     document.getElementById('aslForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -54,10 +137,18 @@
           document.getElementById('downloadLink').href = data.video_url;
           document.getElementById('downloadLink').download = 'asl_output.mp4';
           document.getElementById('previewSection').style.display = 'block';
+        } else {
+          alert("⚠️ No video returned. Please try again.");
         }
       })
-      .catch(err => alert("Error generating video"));
+      .catch(err => {
+        console.error(err);
+        alert("⚠️ Error generating ASL video.");
+      });
     });
   </script>
+
+  <script src="{% static 'js/profile.js' %}"></script>
 </body>
 </html>
+

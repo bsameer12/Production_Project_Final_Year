@@ -13,7 +13,9 @@ urlpatterns = [
     path('generate_sentence/', views.generate_sentence_view, name='generate_sentence'),
     path('sentence-history/', views.sentence_history_view, name='sentence_history'),
     path('admin_sentence-history/', views.admin_sentence_history_view, name='admin_sentence_history'),
-    path("english-to-asl/", views.english_to_asl_view, name="english_to_asl")
+    path("english-to-asl/", views.english_to_asl_view, name="english_to_asl"),
+    path("generate-asl-video/", views.generate_asl_video, name="generate_asl_video"),
+
 
 
 
