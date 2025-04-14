@@ -28,3 +28,12 @@ class AuditLog(models.Model):
         return f"{self.user} - {self.action} at {self.timestamp}"
 
 
+
+class ASLSentenceGeneration(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    predictions = models.JSONField()  # e.g., ['H', 'E', 'L', 'L', 'O']
+    generated_sentence = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.generated_sentence[:30]}..."

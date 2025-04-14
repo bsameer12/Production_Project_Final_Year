@@ -12,8 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import google.generativeai as genai
 import json
-
-
+from .models import ASLSentenceGeneration
 
 @csrf_exempt
 @login_required
@@ -27,25 +26,34 @@ def generate_sentence_view(request):
             if not predictions:
                 return JsonResponse({"error": "No predictions provided."}, status=400)
 
-            # Configure Gemini
+            # 🌐 Gemini Config
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel(model_name="models/gemini-1.5-flash")
 
-            # Determine input type
             is_letters = all(len(p) == 1 for p in predictions)
             combined = "".join(predictions) if is_letters else " ".join(predictions)
 
-            # Build prompt
-            if is_letters and len(predictions) <= 2:
-                prompt = f"What could the following signed letters mean? {combined}. Suggest the most likely English word or greeting."
-            else:
-                prompt = f"The following sequence of signed inputs was detected: {combined}. Convert this into a meaningful and grammatically correct English sentence."
+            prompt = (
+                f"What could the following signed letters mean? {combined}. "
+                f"Suggest the most likely English word or greeting."
+                if is_letters and len(predictions) <= 2
+                else f"The following sequence of signed inputs was detected: {combined}. "
+                     f"Convert this into a meaningful and grammatically correct English sentence."
+            )
 
-            # Generate content
+            # 🔮 Gemini Prediction
             response = model.generate_content(prompt)
             sentence = response.text.strip() if hasattr(response, 'text') else "No response generated."
 
             print("✅ Gemini Response:", sentence)
+
+            # 💾 Save to DB
+            ASLSentenceGeneration.objects.create(
+                user=request.user,
+                predictions=predictions,
+                generated_sentence=sentence
+            )
+
             return JsonResponse({"sentence": sentence})
 
         except Exception as e:
