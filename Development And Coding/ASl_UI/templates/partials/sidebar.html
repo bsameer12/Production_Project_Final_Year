@@ -19,6 +19,11 @@
     {% if user.is_superuser %}
     <li><a href="{% url 'admin_prediction_history' %}"><i class="fas fa-users"></i><span>Users Prediction History</span></a></li>
     <li><a href="{% url 'admin_user_history' %}"><i class="fas fa-clipboard-list"></i><span>Users Audit History</span></a></li>
+    <li>
+    <a href="{% url 'admin_sentence_history' %}">
+      <i class="fas fa-file-alt"></i><span>Users Sentence History</span>
+    </a>
+  </li>
     {% endif %}
 
     <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>

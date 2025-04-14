@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Sentence History</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+</head>
+<body>
+  {% include 'partials/sidebar.html' %}
+
+  <div class="content-area">
+    <header class="page-header">
+      <h2><button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+        Users' Sentence History</h2>
+    </header>
+
+    <div class="table-container">
+      <table id="sentenceTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Input Predictions</th>
+            <th>Generated Sentence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sentences %}
+          <tr>
+            <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ s.user.get_full_name|default:s.user.username }}</td>
+            <td>{{ s.predictions|join:", " }}</td>
+            <td>{{ s.generated_sentence }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="{% static 'js/prediction_history.js' %}"></script>
+</body>
+</html>

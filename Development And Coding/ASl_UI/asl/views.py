@@ -175,3 +175,14 @@ def admin_user_history_view(request):
 def sentence_history_view(request):
     generations = ASLSentenceGeneration.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'sentence_history.html', {'generations': generations})
+
+
+@login_required
+def admin_sentence_history_view(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied("You do not have permission to view this page.")
+
+    # Exclude the admin's own entries
+    sentences = ASLSentenceGeneration.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
+
+    return render(request, 'admin_sentence_history.html', {'sentences': sentences})
