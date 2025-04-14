@@ -11,6 +11,8 @@ urlpatterns = [
     path('admin_prediction-history/', views.admin_prediction_history_view, name='admin_prediction_history'),
     path('admin-user-history/', views.admin_user_history_view, name='admin_user_history'),
     path('generate_sentence/', views.generate_sentence_view, name='generate_sentence'),
+    path('sentence-history/', views.sentence_history_view, name='sentence_history'),
+
 
 
 

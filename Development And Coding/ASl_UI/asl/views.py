@@ -169,3 +169,9 @@ def admin_user_history_view(request):
 
     audit_logs = AuditLog.objects.exclude(user=request.user).select_related('user').order_by('-timestamp')
     return render(request, 'user_history.html', {'predictions': audit_logs})
+
+
+@login_required
+def sentence_history_view(request):
+    generations = ASLSentenceGeneration.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'sentence_history.html', {'generations': generations})
