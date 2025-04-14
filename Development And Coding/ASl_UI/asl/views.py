@@ -12,6 +12,7 @@ from .utils import log_user_activity
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import ASLPrediction
+from .models import AuditLog
 
 @login_required
 def prediction_history_view(request):
@@ -92,3 +93,10 @@ def predict_landmarks(request):
             return JsonResponse({"error": f"Server error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Only POST requests are allowed."}, status=405)
+
+
+
+@login_required
+def user_history_view(request):
+    audit_logs = AuditLog.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'user_history.html', {'predictions': audit_logs})
