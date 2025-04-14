@@ -118,3 +118,7 @@ EMAIL_HOST_PASSWORD = "ducm qeli ilzi khjb"  # Use App Password if 2FA enabled
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
+GEMINI_API_KEY = "AIzaSyCGjlcMhMR637L69s5GvVpFhQNdgi_a0ek"
+
+
+

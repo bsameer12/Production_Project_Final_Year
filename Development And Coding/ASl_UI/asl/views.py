@@ -1,19 +1,60 @@
 import os
-import json
 import numpy as np
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 from tensorflow.keras.models import load_model
-from .models import ASLPrediction
-from django.utils.timezone import now
 from .utils import log_user_activity
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import ASLPrediction
 from .models import AuditLog
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+import google.generativeai as genai
+import json
+
+
+
+@csrf_exempt
+@login_required
+def generate_sentence_view(request):
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body.decode("utf-8"))
+            predictions = body.get("predictions", [])
+            print("🧠 Received predictions:", predictions)
+
+            if not predictions:
+                return JsonResponse({"error": "No predictions provided."}, status=400)
+
+            # Configure Gemini
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel(model_name="models/gemini-1.5-flash")
+
+            # Determine input type
+            is_letters = all(len(p) == 1 for p in predictions)
+            combined = "".join(predictions) if is_letters else " ".join(predictions)
+
+            # Build prompt
+            if is_letters and len(predictions) <= 2:
+                prompt = f"What could the following signed letters mean? {combined}. Suggest the most likely English word or greeting."
+            else:
+                prompt = f"The following sequence of signed inputs was detected: {combined}. Convert this into a meaningful and grammatically correct English sentence."
+
+            # Generate content
+            response = model.generate_content(prompt)
+            sentence = response.text.strip() if hasattr(response, 'text') else "No response generated."
+
+            print("✅ Gemini Response:", sentence)
+            return JsonResponse({"sentence": sentence})
+
+        except Exception as e:
+            print("❌ Gemini backend error:", str(e))
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "GET not allowed"}, status=405)
+
+
 
 @login_required
 def prediction_history_view(request):

@@ -9,23 +9,24 @@ let handPreviouslyDetected = false;
 let lastPrediction = null;
 let lastTTSLabel = null;
 
-// Chart instances
 let predictionChart, scatterChart;
+let predictionSequence = []; // store top-1 predictions
+
+function appendToHistory(label, confidence) {
+  predictionSequence.push(label);
+
+  const item = document.createElement("li");
+  item.textContent = `${new Date().toLocaleString()} → ${label} (${confidence})`;
+  document.getElementById("predictionHistory").prepend(item);
+
+  // Live output preview
+  document.getElementById("sentence-output").value = predictionSequence.join('');
+}
 
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
-  const screenWidth = window.innerWidth;
-
-  if (screenWidth <= 767) {
-    // Mobile: show/hide full sidebar
-    sidebar.classList.toggle('mobile-open');
-  } else {
-    // Desktop & Tablet: expand/collapse sidebar
-    sidebar.classList.toggle('collapsed');
-  }
+  sidebar.classList.toggle(window.innerWidth <= 767 ? 'mobile-open' : 'collapsed');
 }
-
-
 
 function updateCameraStatus(active) {
   document.getElementById("camera-dot").className = "dot " + (active ? "green" : "red");
@@ -50,12 +51,6 @@ function startCooldown() {
   setTimeout(() => (cooldown = false), 5000);
 }
 
-function appendToHistory(label, confidence) {
-  const item = document.createElement("li");
-  item.textContent = `${new Date().toLocaleString()} → ${label} (${confidence})`;
-  document.getElementById("predictionHistory").prepend(item);
-}
-
 function updateLandmarkList(landmarks) {
   document.getElementById("landmarkPoints").innerHTML = landmarks.map(
     (pt, i) => `<div>Point ${i}: x=${pt.x.toFixed(3)}, y=${pt.y.toFixed(3)}, z=${pt.z.toFixed(3)}</div>`
@@ -70,20 +65,63 @@ function clearPrediction() {
   document.getElementById("top3").textContent = "-";
   document.getElementById("predictionHistory").innerHTML = "";
   document.getElementById("landmarkPoints").innerHTML = "";
+  document.getElementById("sentence-output").value = "";
   landmarkQueue = [];
+  predictionSequence = [];
   lastPrediction = null;
+  lastTTSLabel = null;
 }
 
 function startPrediction() {
   predicting = true;
   startCooldown();
   document.getElementById("feedbackBox").textContent = "Prediction Running...";
+  document.getElementById("sentence-output").value = predictionSequence.join('');
 }
 
 function stopPrediction() {
+ console.log("🛑 stopPrediction() triggered");
   predicting = false;
   document.getElementById("feedbackBox").textContent = "Prediction Paused.";
+
+  if (predictionSequence.length > 0) {
+    console.log("🟢 Letters collected:", predictionSequence);
+
+    fetch("/generate_sentence/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken()
+      },
+      body: JSON.stringify({ predictions: predictionSequence })
+    })
+    .then(r => {
+      if (!r.ok) throw new Error(`Server returned ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      console.log("✅ ChatGPT Response:", data);
+      const sentenceBox = document.getElementById("sentence-output");
+
+      if (data.sentence) {
+        sentenceBox.value = data.sentence;
+        if (ttsEnabled) {
+          window.speechSynthesis.speak(new SpeechSynthesisUtterance(data.sentence));
+        }
+      } else if (data.error) {
+        sentenceBox.value = `⚠️ ChatGPT Error: ${data.error}`;
+      }
+    })
+    .catch(error => {
+      console.error("❌ Error sending to backend:", error);
+      document.getElementById("sentence-output").value = `⚠️ Error: ${error.message}`;
+    });
+  } else {
+    console.warn("⚠️ No predictions to send to ChatGPT.");
+    document.getElementById("sentence-output").value = "⚠️ No predictions to send.";
+  }
 }
+
 
 function toggleTTS() {
   ttsEnabled = document.getElementById("ttsToggle").checked;
@@ -104,7 +142,12 @@ async function startCamera() {
       locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
     });
 
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7
+    });
 
     hands.onResults(results => {
       ctx.save();
@@ -118,7 +161,6 @@ async function startCamera() {
         if (handPreviouslyDetected) {
           handPreviouslyDetected = false;
           document.getElementById("feedbackBox").textContent = "Hand not detected.";
-          clearPrediction();
         }
         if (!predicting) document.getElementById("feedbackBox").textContent = "Prediction Off";
         ctx.restore();
@@ -151,28 +193,39 @@ async function startCamera() {
 
           fetch("/predict_landmarks/", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken()
+            },
             body: JSON.stringify({ sequence })
           })
-            .then(r => r.json())
-            .then(data => {
-              if (data.error) return (document.getElementById("feedbackBox").textContent = data.error);
-              if (data.label === lastPrediction) return (document.getElementById("feedbackBox").textContent = "Prediction Paused: Same Gesture");
+          .then(r => r.json())
+          .then(data => {
+            if (data.error) {
+              document.getElementById("feedbackBox").textContent = data.error;
+              return;
+            }
 
-              lastPrediction = data.label;
-              document.getElementById("prediction").textContent = data.label;
-              document.getElementById("confidence").textContent = data.confidence;
-              document.getElementById("top2").textContent = `${data.top2.label} (${data.top2.confidence})`;
-              document.getElementById("top3").textContent = `${data.top3.label} (${data.top3.confidence})`;
-              document.getElementById("feedbackBox").textContent = `Prediction: ${data.label} (${data.confidence})`;
-              appendToHistory(data.label, data.confidence);
-              updatePredictionChart(data);
+            if (data.label === lastPrediction) {
+              document.getElementById("feedbackBox").textContent = "Prediction Paused: Same Gesture";
+              return;
+            }
 
-              if (ttsEnabled && data.confidence > 0.75 && data.label !== lastTTSLabel) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(data.label));
-                lastTTSLabel = data.label;
-              }
-            });
+            lastPrediction = data.label;
+            document.getElementById("prediction").textContent = data.label;
+            document.getElementById("confidence").textContent = data.confidence;
+            document.getElementById("top2").textContent = `${data.top2.label} (${data.top2.confidence})`;
+            document.getElementById("top3").textContent = `${data.top3.label} (${data.top3.confidence})`;
+            document.getElementById("feedbackBox").textContent = `Prediction: ${data.label} (${data.confidence})`;
+
+            appendToHistory(data.label, data.confidence);
+            updatePredictionChart(data);
+
+            if (ttsEnabled && data.confidence > 0.75 && data.label !== lastTTSLabel) {
+              window.speechSynthesis.speak(new SpeechSynthesisUtterance(data.label));
+              lastTTSLabel = data.label;
+            }
+          });
         }
       }
     });
@@ -183,6 +236,7 @@ async function startCamera() {
       height: canvas.height
     });
     camera.start();
+
   } catch (e) {
     alert("Webcam access denied.");
     updateCameraStatus(false);
@@ -240,7 +294,6 @@ function stopCamera() {
   updateCameraStatus(false);
   document.getElementById("feedbackBox").textContent = "Camera stopped.";
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
   updateCameraStatus(false);
