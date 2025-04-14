@@ -8,7 +8,9 @@ urlpatterns = [
     path("predict_landmarks/", views.predict_landmarks, name="predict_landmarks"),  # ✅ AJAX endpoint
     path('prediction-history/', views.prediction_history_view, name='prediction_history'),
     path('user-history/', views.user_history_view, name='user_history'),
-    path('admin_prediction-history/', views.admin_prediction_history_view, name='admin_prediction_history')
+    path('admin_prediction-history/', views.admin_prediction_history_view, name='admin_prediction_history'),
+    path('admin-user-history/', views.admin_user_history_view, name='admin_user_history'),
+
 
 ]
 

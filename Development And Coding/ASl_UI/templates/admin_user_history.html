@@ -44,7 +44,7 @@
     <header class="page-header">
       <h2>
         <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
-        User History
+        User's History
       </h2>
     </header>
 
@@ -79,7 +79,6 @@
       <table id="predictionTable">
         <thead>
           <tr>
-            <th>User</th>
             <th>Timestamp</th>
             <th>Action</th>
             <th>Description</th>
@@ -90,7 +89,6 @@
         <tbody>
           {% for log in predictions %}
           <tr>
-             <td data-label="User">{{ log.user.first_name }} {{ log.user.last_name }}</td>
             <td data-label="Timestamp">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
             <td data-label="Action">{{ log.action }}</td>
             <td data-label="Description">{{ log.description }}</td>

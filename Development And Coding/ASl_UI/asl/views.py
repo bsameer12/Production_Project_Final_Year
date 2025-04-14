@@ -111,3 +111,12 @@ def admin_prediction_history_view(request):
     predictions = ASLPrediction.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
 
     return render(request, 'admin_prediction_history.html', {'predictions': predictions})
+
+
+@login_required
+def admin_user_history_view(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied("You do not have permission to view this page.")
+
+    audit_logs = AuditLog.objects.exclude(user=request.user).select_related('user').order_by('-timestamp')
+    return render(request, 'user_history.html', {'predictions': audit_logs})
