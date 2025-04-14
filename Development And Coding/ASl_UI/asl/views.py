@@ -170,6 +170,13 @@ def predict_landmarks(request):
 
 @login_required
 def user_history_view(request):
+    # 📝 Log this page visit
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited User Audit History"
+    )
+
     audit_logs = AuditLog.objects.filter(user=request.user).order_by('-timestamp')
     return render(request, 'user_history.html', {'predictions': audit_logs})
 
