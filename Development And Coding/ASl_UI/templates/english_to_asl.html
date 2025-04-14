@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English To ASL</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  {% include 'partials/sidebar.html' %}
+
+
+  <!-- Page Content -->
+  <div class="content-area">
+      <header class="page-header">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+      <h2>English To ASL Dashboard</h2>
+    </header>
+    <form id="aslForm">
+    {% csrf_token %}
+    <textarea name="text" id="text" rows="4" cols="50" placeholder="Type English text..."></textarea><br><br>
+    <button type="submit">Generate</button>
+  </form>
+
+  <div id="previewSection" style="display:none;">
+    <h3>Preview:</h3>
+    <video id="aslPreview" width="400" controls></video>
+    <br><a id="downloadLink" href="#" download>Download Video</a>
+  </div>
+  </div>
+<script>
+    document.getElementById('aslForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('text', document.getElementById('text').value);
+
+      fetch("{% url 'generate_asl_video' %}", {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.video_url) {
+          document.getElementById('aslPreview').src = data.video_url;
+          document.getElementById('downloadLink').href = data.video_url;
+          document.getElementById('downloadLink').download = 'asl_output.mp4';
+          document.getElementById('previewSection').style.display = 'block';
+        }
+      })
+      .catch(err => alert("Error generating video"));
+    });
+  </script>
+</body>
+</html>

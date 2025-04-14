@@ -13,6 +13,14 @@ from django.conf import settings
 import google.generativeai as genai
 import json
 from .models import ASLSentenceGeneration
+import os, string, tempfile
+from django.shortcuts import render
+from PIL import ImageFont, ImageDraw, Image
+import cv2
+
+
+
+
 
 @csrf_exempt
 @login_required
@@ -237,3 +245,48 @@ def admin_sentence_history_view(request):
     sentences = ASLSentenceGeneration.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
 
     return render(request, 'admin_sentence_history.html', {'sentences': sentences})
+
+
+@csrf_exempt
+@login_required
+def generate_asl_video(request):
+    if request.method == 'POST':
+        text = request.POST.get('text', '').upper().strip()
+        if not text:
+            return JsonResponse({"error": "No input provided."}, status=400)
+
+        images_path = os.path.join(settings.BASE_DIR, 'your_app', 'asl_images')
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'asl_videos')
+        os.makedirs(output_dir, exist_ok=True)
+
+        frames = []
+        for char in text:
+            img_file = os.path.join(images_path, f"{char}.jpg")
+            if os.path.exists(img_file):
+                img = cv2.imread(img_file)
+
+                # Overlay username and timestamp
+                overlay_text = f"{request.user.username.upper()} | {now().strftime('%Y-%m-%d %H:%M:%S')}"
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(img, overlay_text, (10, img.shape[0] - 10), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+
+                # Repeat frame 5 times (approx 5 seconds @ 1 fps)
+                for _ in range(5):
+                    frames.append(img)
+
+        if not frames:
+            return JsonResponse({"error": "No valid ASL characters found."}, status=400)
+
+        height, width, _ = frames[0].shape
+        filename = f"asl_{request.user.username}_{now().strftime('%Y%m%d%H%M%S')}.mp4"
+        video_path = os.path.join(output_dir, filename)
+
+        out = cv2.VideoWriter(video_path, cv2.VideoWriter_fourcc(*'mp4v'), 1, (width, height))
+        for frame in frames:
+            out.write(frame)
+        out.release()
+
+        video_url = f"{settings.MEDIA_URL}asl_videos/{filename}"
+        return JsonResponse({"video_url": video_url})
+
+    return render(request, 'asl_to_video.html')
