@@ -229,7 +229,13 @@ def admin_sentence_history_view(request):
     if not request.user.is_superuser:
         raise PermissionDenied("You do not have permission to view this page.")
 
-    # Exclude the admin's own entries
+    # ✍️ Audit log for admin viewing others' sentence generation
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Admin visited all users' Sentence Generation History"
+    )
+
     sentences = ASLSentenceGeneration.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
 
     return render(request, 'admin_sentence_history.html', {'sentences': sentences})
