@@ -9,6 +9,14 @@ from tensorflow.keras.models import load_model
 from .models import ASLPrediction
 from django.utils.timezone import now
 from .utils import log_user_activity
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import ASLPrediction
+
+@login_required
+def prediction_history_view(request):
+    predictions = ASLPrediction.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'prediction_history.html', {'predictions': predictions})
 
 
 # === Load your model once globally ===

@@ -6,81 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 </head>
-<style>
-  .form-section {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      max-width: 100%;
-      width: 90%;
-      margin: 2rem auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .form-section h3 {
-      margin-top: 0;
-    }
-
-    .form-section label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: 500;
-    }
-
-    .form-section input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.3rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    .form-section button {
-      margin-top: 1.5rem;
-      padding: 0.7rem 2rem;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .form-section button:hover {
-      background: #444;
-    }
-
-    .profile-image-preview {
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .profile-image-preview img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-    }
-
-    @media (max-width: 600px) {
-      .form-section {
-        padding: 1rem;
-      }
-
-      .profile-image-preview img {
-        width: 60px;
-        height: 60px;
-      }
-    }
-</style>
 <body>
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
@@ -97,6 +29,7 @@
     <ul>
     <li><a href="{% url 'predict' %}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a></li>
     <li><a href="{% url 'profile' %}"><i class="fas fa-user"></i><span>Profile</span></a></li>
+      <li><a href="{% url 'prediction_history' %}"><i class="fas fa-chart-line"></i><span>Prediction History</span></a></li>
     <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
   </ul>
   </aside>
@@ -104,7 +37,7 @@
   <!-- Page Content -->
   <div class="content-area">
       <header class="page-header">
-      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
       <h2>Profile</h2>
     </header>
     <!-- Update Profile Form -->
@@ -150,20 +83,7 @@
     </form>
   </section>
   </div>
-<script>
-    function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const screenWidth = window.innerWidth;
-
-  if (screenWidth <= 767) {
-    // Mobile: show/hide full sidebar
-    sidebar.classList.toggle('mobile-open');
-  } else {
-    // Desktop & Tablet: expand/collapse sidebar
-    sidebar.classList.toggle('collapsed');
-  }
-}
-</script>
+  <script src="{% static 'js/profile.js' %}"></script>
 </body>
 </html>
 
