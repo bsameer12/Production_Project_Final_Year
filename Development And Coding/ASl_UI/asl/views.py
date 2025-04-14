@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from tensorflow.keras.models import load_model
 from .models import ASLPrediction
 from django.utils.timezone import now
+from .utils import log_user_activity
 
 # === Load your model once globally ===
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -57,6 +58,15 @@ def predict_landmarks(request):
                 top2_confidence=top3[1]["confidence"],
                 top3_label=top3[2]["label"],
                 top3_confidence=top3[2]["confidence"],
+            )
+
+            # After successful prediction
+            log_user_activity(
+                request,
+                action="Prediction",
+                description=f"Top 1: {top3[0]['label']} ({top3[0]['confidence']}), "
+                            f"Top 2: {top3[1]['label']} ({top3[1]['confidence']}), "
+                            f"Top 3: {top3[2]['label']} ({top3[2]['confidence']})"
             )
 
             return JsonResponse({
