@@ -15,6 +15,7 @@
       <h2><i class="fas fa-user-plus"></i> Register</h2>
       {{ form.non_field_errors }}
 
+      <!-- Username -->
       <div class="floating-label-group">
         {{ form.username }}
         <label for="id_username">Username</label>
@@ -22,6 +23,40 @@
         <small class="error"></small>
       </div>
 
+      <!-- Email -->
+      <div class="floating-label-group">
+        {{ form.email }}
+        <label for="id_email">Email</label>
+        <i class="fas fa-envelope icon"></i>
+        <small class="error"></small>
+      </div>
+
+
+      <!-- First Name -->
+      <div class="floating-label-group">
+        {{ form.first_name }}
+        <label for="id_first_name">First Name</label>
+        <i class="fas fa-id-card icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Last Name -->
+      <div class="floating-label-group">
+        {{ form.last_name }}
+        <label for="id_last_name">Last Name</label>
+        <i class="fas fa-id-card icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Contact Number -->
+      <div class="floating-label-group">
+        {{ form.contact_number }}
+        <label for="id_contact_number">Contact Number</label>
+        <i class="fas fa-phone icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Passwords -->
       <div class="floating-label-group">
         {{ form.password1 }}
         <label for="id_password1">Password</label>
