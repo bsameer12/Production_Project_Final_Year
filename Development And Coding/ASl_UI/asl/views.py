@@ -186,10 +186,15 @@ def admin_prediction_history_view(request):
     if not request.user.is_superuser:
         raise PermissionDenied("You do not have permission to view this page.")
 
+    # 📝 Log audit trail for viewing others' prediction history
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Users Prediction History (Admin View)"
+    )
+
     predictions = ASLPrediction.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
-
     return render(request, 'admin_prediction_history.html', {'predictions': predictions})
-
 
 @login_required
 def admin_user_history_view(request):
