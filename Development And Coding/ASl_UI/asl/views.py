@@ -201,6 +201,13 @@ def admin_user_history_view(request):
     if not request.user.is_superuser:
         raise PermissionDenied("You do not have permission to view this page.")
 
+    # 📝 Audit log entry for admin viewing others' audit trail
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Users Audit History (Admin View)"
+    )
+
     audit_logs = AuditLog.objects.exclude(user=request.user).select_related('user').order_by('-timestamp')
     return render(request, 'user_history.html', {'predictions': audit_logs})
 
