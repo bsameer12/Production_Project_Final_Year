@@ -102,6 +102,13 @@ class_labels = {i: label for i, label in enumerate(label_map)}
 # === Dashboard View ===
 @login_required
 def predict_dashboard(request):
+    # 📝 Audit log for dashboard visit
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited ASL Prediction Dashboard"
+    )
+
     return render(request, "dashboard.html", {"user": request.user})
 
 
