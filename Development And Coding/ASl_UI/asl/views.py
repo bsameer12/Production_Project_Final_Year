@@ -113,8 +113,6 @@ def predict_dashboard(request):
 
 
 
-
-# === AJAX Prediction Endpoint ===
 # === AJAX Prediction Endpoint ===
 @csrf_exempt
 @login_required
