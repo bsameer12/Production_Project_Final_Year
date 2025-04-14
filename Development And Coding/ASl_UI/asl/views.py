@@ -214,9 +214,15 @@ def admin_user_history_view(request):
 
 @login_required
 def sentence_history_view(request):
+    # 📝 Log the visit to sentence history page
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Sentence Generation History"
+    )
+
     generations = ASLSentenceGeneration.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'sentence_history.html', {'generations': generations})
-
 
 @login_required
 def admin_sentence_history_view(request):
