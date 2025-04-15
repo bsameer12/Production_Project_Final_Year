@@ -133,10 +133,30 @@ def verify_email(request, token):
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'auth/password_reset.html'
-    email_template_name = 'auth/password_reset_email.txt'  # fallback plain text
-    html_email_template_name = 'auth/password_reset_email.html'  # ✅ key fix
+    email_template_name = 'auth/password_reset_email.txt'
+    html_email_template_name = 'auth/password_reset_email.html'
     subject_template_name = 'auth/password_reset_email.txt'
     success_url = reverse_lazy('password_reset_done')
+
+    def form_valid(self, form):
+        # 🔍 Try to find the user for audit logging
+        email = form.cleaned_data.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            log_user_activity(
+                self.request,
+                action="Password Reset Requested",
+                description=f"Password reset link requested for user '{user.username}'"
+            )
+        else:
+            log_user_activity(
+                self.request,
+                action="Password Reset Attempt",
+                description=f"Password reset attempted for non-registered email: {email}"
+            )
+
+        return super().form_valid(form)
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'auth/password_reset_done.html'
