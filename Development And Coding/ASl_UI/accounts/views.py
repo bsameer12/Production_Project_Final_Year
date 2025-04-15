@@ -183,6 +183,15 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         )
         return super().get(request, *args, **kwargs)
 
-    
+
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'auth/password_reset_complete.html'
+
+    def get(self, request, *args, **kwargs):
+        # 📝 Log password reset completion
+        log_user_activity(
+            request,
+            action="Password Reset Complete",
+            description="User landed on Password Reset Complete page after setting a new password"
+        )
+        return super().get(request, *args, **kwargs)
