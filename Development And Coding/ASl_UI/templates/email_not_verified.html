@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Not Verified</title>
+  <link rel="stylesheet" href="{% static 'css/email_not_verified.css' %}">
+</head>
+<body>
+  {% include 'partials/navbar.html' %}
+
+  <div class="complete-box">
+    <h2>Email Not Verified</h2>
+    <p>Hello <strong>{{ user.get_full_name|default:user.username }}</strong>, your email is not verified yet.</p>
+    <p>Please click the button below to resend the verification email.</p>
+
+    {% for message in messages %}
+      {% if 'email' in message.tags %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+
+    <form method="post">
+      {% csrf_token %}
+      <button name="resend" type="submit" class="btn btn-primary">Resend Verification Email</button>
+      <button name="logout" type="submit" class="btn btn-secondary">Logout</button>
+    </form>
+  </div>
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+  }, 9000);
+</script>
+</body>
+</html>

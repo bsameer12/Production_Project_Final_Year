@@ -3,6 +3,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from .views import email_not_verified_view
 
 
 
@@ -12,4 +13,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('verify/<uuid:token>/', views.verify_email, name='verify_email'),
     path('profile/', views.profile_view, name='profile'),
+    path('email-not-verified/', email_not_verified_view, name='email_not_verified'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

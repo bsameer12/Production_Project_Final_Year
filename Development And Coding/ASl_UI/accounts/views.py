@@ -16,6 +16,8 @@ from asl.utils import log_user_activity
 from asl.models import AuditLog
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import get_user_model
+from .utils import send_verification_email
 
 
 @login_required
@@ -91,13 +93,16 @@ def login_view(request):
                 messages.success(request, f"Welcome back, {name}!", extra_tags='login')
                 return redirect('predict')
             else:
-                messages.error(request, "Please verify your email before logging in.", extra_tags='login')
+                # Temporarily login user in session only to allow resend
+                request.session['unverified_user_id'] = user.id
+                return redirect('email_not_verified')
         else:
             messages.error(request, "Please enter a correct username and password.", extra_tags='login')
     else:
         form = CustomLoginForm()
 
     return render(request, 'login.html', {'form': form})
+
 
 
 def logout_view(request):
@@ -192,3 +197,21 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
         )
         messages.success(request, "Your password has been reset successfully!", extra_tags='password')
         return super().get(request, *args, **kwargs)
+
+
+def email_not_verified_view(request):
+    user_id = request.session.get('unverified_user_id')
+    user = get_user_model().objects.filter(id=user_id).first()
+
+    if not user or not hasattr(user, 'profile') or user.profile.is_verified:
+        return redirect('login')  # fallback
+
+    if request.method == 'POST':
+        if 'resend' in request.POST:
+            send_verification_email(user, request)
+            messages.success(request, "Verification email resent. Please check your inbox.", extra_tags='email')
+        elif 'logout' in request.POST:
+            request.session.flush()
+            return redirect('login')
+
+    return render(request, 'email_not_verified.html', {'user': user})
