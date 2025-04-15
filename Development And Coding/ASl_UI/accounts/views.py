@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Profile
+from .forms import CustomLoginForm  # Your form with placeholders
 
 @login_required
 def profile_view(request):
@@ -54,27 +55,23 @@ def register_view(request):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('predict')  # Already logged in
+
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomLoginForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                if user.profile.is_verified:
-                    login(request, user)
-                    messages.success(request, f'Welcome back, {user.username}!')
-                    return redirect('predict')  # Update this to your main page
-                else:
-                    messages.error(request, "Please verify your email before logging in.")
+            user = form.get_user()
+            if hasattr(user, 'profile') and user.profile.is_verified:
+                login(request, user)
+                messages.success(request, f"Welcome back, {user.username}!")
+                return redirect('predict')
             else:
-                messages.error(request, "Invalid username or password.")
+                messages.error(request, "Please verify your email before logging in.")
         else:
-            messages.error(request, "Invalid login details.")
+            messages.error(request, "Please enter a correct username and password.")
     else:
-        form = AuthenticationForm()
+        form = CustomLoginForm()
 
     return render(request, 'login.html', {'form': form})
 

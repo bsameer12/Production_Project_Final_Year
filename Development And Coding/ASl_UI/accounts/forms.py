@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile
-
+from django.contrib.auth.forms import AuthenticationForm
 class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
@@ -29,3 +29,20 @@ class CustomUserCreationForm(UserCreationForm):
             profile.save()
 
         return user
+
+
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Username',
+            'autocomplete': 'username',
+            'class': 'with-placeholder'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Password',
+            'autocomplete': 'current-password',
+            'class': 'with-placeholder'
+        })
+    )

@@ -16,15 +16,14 @@
 
       {{ form.non_field_errors }}
       {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+      <ul class="messages" id="messageBox">
+        {% for message in messages %}
+          <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
 
-
-      <div class="floating-label-group">
+      <div class="floating-label-group" style="margin-top:50px;">
         {{ form.username }}
         <label for="id_username">Username</label>
         <i class="fas fa-user icon"></i>
@@ -41,9 +40,23 @@
       <button type="submit" id="loginBtn">Login</button>
       <div id="loader" class="loader" style="display: none;"></div>
       <p class="redirect-text">Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+      <p class="redirect-text">
+  Forgot password? <a href="{% url 'password_reset' %}">Reset here</a>
+</p>
     </form>
   </div>
 
   <script src="{% static 'js/login.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const messageBox = document.getElementById("messageBox");
+      if (messageBox) {
+        setTimeout(() => {
+          messageBox.style.opacity = "0";
+          setTimeout(() => messageBox.remove(), 500);
+        }, 4000);
+      }
+    });
+  </script>
 </body>
 </html>
