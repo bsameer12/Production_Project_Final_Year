@@ -336,6 +336,13 @@ def generate_asl_video(request):
 
 @login_required
 def english_to_asl_view(request):
+    # Log page visit
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited English to ASL translation page"
+    )
+
     return render(request, "english_to_asl.html")
 
 
