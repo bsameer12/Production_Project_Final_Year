@@ -21,6 +21,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from accounts import views as account_views
 from django.views.generic.base import RedirectView
+from django.urls import path
+from accounts.views import (
+    CustomPasswordResetView,
+    CustomPasswordResetDoneView,
+    CustomPasswordResetConfirmView,
+    CustomPasswordResetCompleteView
+)
 
 
 urlpatterns = [
@@ -30,5 +37,9 @@ urlpatterns = [
     path('', include('asl.urls')),
     path('profile/', account_views.profile_view, name='profile'),
     path('accounts/', include('django.contrib.auth.urls')),
+path('password-reset/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', account_views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', account_views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', account_views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
