@@ -9,6 +9,14 @@
   <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
 </head>
+<style>
+  td[data-label="Video"] span {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #999;
+}
+
+</style>
 <body>
 
 {% include 'partials/sidebar.html' %}
@@ -67,7 +75,13 @@
           <td data-label="Frames">{{ video.frame_count }}</td>
           <td data-label="Duration">{{ video.video_duration_sec }}</td>
           <td data-label="Size">{{ video.video_size_kb }}</td>
-          <td data-label="Video"><a href="{{ video.video_url }}" target="_blank">View</a></td>
+         <td data-label="Video">
+      {% if video.is_deleted %}
+        <span style="color: gray;">Deleted at {{ video.deleted_at|date:"Y-m-d H:i" }}</span>
+      {% else %}
+        <a href="{{ video.video_url }}" target="_blank">View</a>
+      {% endif %}
+    </td>
         </tr>
         {% endfor %}
       </tbody>

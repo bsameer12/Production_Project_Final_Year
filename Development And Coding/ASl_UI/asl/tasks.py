@@ -7,7 +7,7 @@ from asl.models import ASLVideoHistory
 
 def delete_expired_videos():
     while True:
-        threshold = now() - timedelta(minutes=30)
+        threshold = now() - timedelta(minutes=1)
         expired_videos = ASLVideoHistory.objects.filter(created_at__lt=threshold, is_deleted=False)
 
         for video in expired_videos:
