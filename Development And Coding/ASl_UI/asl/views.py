@@ -1,5 +1,3 @@
-import os
-import numpy as np
 from tensorflow.keras.models import load_model
 from .utils import log_user_activity
 from django.shortcuts import render
@@ -19,6 +17,8 @@ import cv2
 import numpy as np
 import imageio
 from django.conf import settings
+from .models import ASLVideoHistory
+
 
 
 
@@ -318,10 +318,30 @@ def generate_asl_video(request):
 
         video_url = f"{settings.MEDIA_URL}asl_videos/{filename}"
         print(f"🎥 Saved video: {video_url}")
+
+        # Get video size and duration
+        video_size_kb = round(os.path.getsize(video_path) / 1024, 2)
+        video_duration = len(frames) / fps
+
+        # Save tracking info to DB
+        ASLVideoHistory.objects.create(
+            user=request.user,
+            input_text=text,
+            frame_count=len(frames),
+            video_size_kb=video_size_kb,
+            video_duration_sec=video_duration,
+            video_name=filename,
+            video_url=video_url
+        )
+
         return JsonResponse({"video_url": video_url})
+
     except Exception as e:
         print(f"❌ Video writing error: {e}")
         return JsonResponse({"error": "Video writing failed."}, status=500)
+
+
+
 @login_required
 def english_to_asl_view(request):
     return render(request, "english_to_asl.html")

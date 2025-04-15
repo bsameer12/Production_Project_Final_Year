@@ -37,3 +37,21 @@ class ASLSentenceGeneration(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.generated_sentence[:30]}..."
+
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class ASLVideoHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    input_text = models.TextField()
+    frame_count = models.IntegerField()
+    video_size_kb = models.FloatField()
+    video_duration_sec = models.FloatField()
+    video_name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    video_url = models.URLField()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.video_name}"
