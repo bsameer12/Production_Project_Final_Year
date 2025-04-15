@@ -14,46 +14,50 @@ from .forms import CustomUserCreationForm, CustomLoginForm
 from .utils import send_verification_email
 from asl.utils import log_user_activity
 from asl.models import AuditLog
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 
 @login_required
 def profile_view(request):
     user = request.user
-
-    log_user_activity(
-        request,
-        action="Page Visit",
-        description="Visited Profile page"
-    )
+    log_user_activity(request, action="Page Visit", description="Visited Profile page")
 
     if not hasattr(user, 'profile'):
         Profile.objects.create(user=user)
 
     profile = user.profile
+    password_form = PasswordChangeForm(user=user, data=request.POST or None)
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.save()
+        # Check which form was submitted using a name
+        if 'update_profile' in request.POST:
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            user.save()
 
-        profile.contact_number = request.POST.get('contact')
+            profile.contact_number = request.POST.get('contact')
+            if request.FILES.get('profile_picture'):
+                profile.profile_picture = request.FILES.get('profile_picture')
+            profile.save()
 
-        if request.FILES.get('profile_picture'):
-            profile.profile_picture = request.FILES.get('profile_picture')
+            messages.success(request, "Profile updated successfully!", extra_tags='profile')
+            log_user_activity(request, action="Profile Update", description="Updated profile details")
 
-        profile.save()
+        elif 'change_password' in request.POST:
+            if password_form.is_valid():
+                password_form.save()
+                update_session_auth_hash(request, user)  # Keep user logged in
+                messages.success(request, "Password changed successfully!", extra_tags='password')
+                log_user_activity(request, action="Password Changed", description="User changed their password")
+            else:
+                messages.error(request, "Password change failed. See errors below.", extra_tags='password')
 
-        messages.success(request, "Profile updated successfully!", extra_tags='profile')
-
-        log_user_activity(
-            request,
-            action="Profile Update",
-            description="Updated profile details"
-        )
-
-        return redirect('profile')
-
-    return render(request, 'profile.html', {'user': user, 'profile': profile})
+    return render(request, 'profile.html', {
+        'user': user,
+        'profile': profile,
+        'password_form': password_form,
+    })
 
 
 def register_view(request):
