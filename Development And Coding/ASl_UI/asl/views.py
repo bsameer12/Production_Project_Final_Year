@@ -345,3 +345,10 @@ def generate_asl_video(request):
 @login_required
 def english_to_asl_view(request):
     return render(request, "english_to_asl.html")
+
+
+@login_required
+def asl_video_history(request):
+    user = request.user
+    videos = ASLVideoHistory.objects.filter(user=user).order_by('-created_at')
+    return render(request, 'asl_video_history.html', {'videos': videos})
