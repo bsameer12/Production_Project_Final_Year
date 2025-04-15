@@ -59,10 +59,13 @@
       border-radius: 10px;
       padding: 1.5rem;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      height: 100%;
     }
 
     #aslPreview {
-      width: 100%;
+      width: 90%;
+      height: 40%;
       border-radius: 10px;
       margin-bottom: 1rem;
     }
@@ -112,7 +115,10 @@
 
     <div id="previewSection" style="display:none;">
       <h3>Video Preview</h3>
-      <video id="aslPreview" controls></video><br>
+      <video id="aslPreview" controls>
+  <source id="aslSource" src="" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
       <a id="downloadLink" href="#" download>Download ASL Video</a>
     </div>
   </div>
@@ -120,32 +126,42 @@
 
   <script>
     document.getElementById('aslForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+  e.preventDefault();
 
-      const formData = new FormData();
-      formData.append('text', document.getElementById('text').value);
+  const formData = new FormData();
+  formData.append('text', document.getElementById('text').value);
 
-      fetch("{% url 'generate_asl_video' %}", {
-        method: 'POST',
-        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.video_url) {
-          document.getElementById('aslPreview').src = data.video_url;
-          document.getElementById('downloadLink').href = data.video_url;
-          document.getElementById('downloadLink').download = 'asl_output.mp4';
-          document.getElementById('previewSection').style.display = 'block';
-        } else {
-          alert("⚠️ No video returned. Please try again.");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("⚠️ Error generating ASL video.");
-      });
-    });
+  fetch("{% url 'generate_asl_video' %}", {
+    method: 'POST',
+    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.video_url) {
+      const video = document.getElementById('aslPreview');
+      const source = document.getElementById('aslSource');  // ✅ Use a static ID
+
+      if (source) {
+        source.src = data.video_url;
+        video.load();       // ⬅️ tells browser to reload the new video
+      } else {
+        video.src = data.video_url;
+      }
+
+      document.getElementById('downloadLink').href = data.video_url;
+      document.getElementById('downloadLink').download = 'asl_output.mp4';
+      document.getElementById('previewSection').style.display = 'block';
+    } else {
+      alert("⚠️ No video returned. Please try again.");
+    }
+  })
+  .catch(err => {
+    console.error("⚠️ Fetch Error:", err);
+    alert("⚠️ Error generating ASL video.");
+  });
+});
+
   </script>
 
   <script src="{% static 'js/profile.js' %}"></script>

@@ -6,17 +6,19 @@ from django.shortcuts import render
 from .models import ASLPrediction
 from .models import AuditLog
 from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
 import google.generativeai as genai
 import json
 from .models import ASLSentenceGeneration
-import os, string, tempfile
 from django.shortcuts import render
-from PIL import ImageFont, ImageDraw, Image
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.utils.timezone import now
+import os
 import cv2
+import numpy as np
+import imageio
+from django.conf import settings
 
 
 
@@ -247,51 +249,79 @@ def admin_sentence_history_view(request):
     return render(request, 'admin_sentence_history.html', {'sentences': sentences})
 
 
+
 @csrf_exempt
 @login_required
 def generate_asl_video(request):
-    if request.method == 'POST':
-        text = request.POST.get('text', '').upper().strip()
-        if not text:
-            return JsonResponse({"error": "No input provided."}, status=400)
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid method"}, status=405)
 
-        images_path = os.path.join(settings.BASE_DIR, 'your_app', 'asl_images')
-        output_dir = os.path.join(settings.MEDIA_ROOT, 'asl_videos')
-        os.makedirs(output_dir, exist_ok=True)
+    text = request.POST.get('text', '').upper().strip()
+    print(f"📥 Received text: '{text}'")
 
-        frames = []
-        for char in text:
-            img_file = os.path.join(images_path, f"{char}.jpg")
-            if os.path.exists(img_file):
-                img = cv2.imread(img_file)
+    if not text:
+        print("⚠️ No input received.")
+        return JsonResponse({"error": "No input provided."}, status=400)
 
-                # Overlay username and timestamp
-                overlay_text = f"{request.user.username.upper()} | {now().strftime('%Y-%m-%d %H:%M:%S')}"
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(img, overlay_text, (10, img.shape[0] - 10), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+    images_path = os.path.join(settings.BASE_DIR, 'asl_images')
+    output_dir = os.path.join(settings.MEDIA_ROOT, 'asl_videos')
+    os.makedirs(output_dir, exist_ok=True)
 
-                # Repeat frame 5 times (approx 5 seconds @ 1 fps)
-                for _ in range(5):
-                    frames.append(img)
+    fps = 2
+    hold_time = 1
+    frames_per_char = fps * hold_time
+    frames = []
 
-        if not frames:
-            return JsonResponse({"error": "No valid ASL characters found."}, status=400)
+    base_width = base_height = None
 
-        height, width, _ = frames[0].shape
-        filename = f"asl_{request.user.username}_{now().strftime('%Y%m%d%H%M%S')}.mp4"
-        video_path = os.path.join(output_dir, filename)
+    for char in text:
+        filename = "space.png" if char == " " else f"{char}.png"
+        img_path = os.path.join(images_path, filename)
 
-        out = cv2.VideoWriter(video_path, cv2.VideoWriter_fourcc(*'mp4v'), 1, (width, height))
-        for frame in frames:
-            out.write(frame)
-        out.release()
+        if not os.path.exists(img_path):
+            img_path = img_path.replace('.png', '.jpg')
+
+        if os.path.exists(img_path):
+            img = cv2.imread(img_path)
+            if img is None:
+                print(f"🚫 Unreadable image: {img_path}")
+                continue
+
+            # Store base size from the first valid image
+            if base_width is None or base_height is None:
+                base_height, base_width = img.shape[:2]
+            else:
+                img = cv2.resize(img, (base_width, base_height))
+
+            overlay_text = f"{request.user.username.upper()} | {now().strftime('%Y-%m-%d %H:%M:%S')}"
+            cv2.putText(img, overlay_text, (10, img.shape[0] - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
+            for _ in range(frames_per_char):
+                frames.append(cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB))  # For imageio
+
+            print(f"✅ Processed '{char}' → {filename}")
+        else:
+            print(f"❌ Missing image for: '{char}'")
+
+    if not frames:
+        print("❌ No valid frames to write.")
+        return JsonResponse({"error": "No valid ASL characters found."}, status=400)
+
+    filename = f"asl_{request.user.username}_{now().strftime('%Y%m%d%H%M%S')}.mp4"
+    video_path = os.path.join(output_dir, filename)
+
+    try:
+        with imageio.get_writer(video_path, fps=fps, codec='libx264', quality=8) as writer:
+            for frame in frames:
+                writer.append_data(frame)
 
         video_url = f"{settings.MEDIA_URL}asl_videos/{filename}"
+        print(f"🎥 Saved video: {video_url}")
         return JsonResponse({"video_url": video_url})
-
-    return render(request, 'asl_to_video.html')
-
-
+    except Exception as e:
+        print(f"❌ Video writing error: {e}")
+        return JsonResponse({"error": "Video writing failed."}, status=500)
 @login_required
 def english_to_asl_view(request):
     return render(request, "english_to_asl.html")
