@@ -1,0 +1,168 @@
+<style>
+  :root {
+    --bg-light: #ffffff;
+    --bg-dark: #1f2937;
+    --text-light: #111827;
+    --text-dark: #f3f4f6;
+    --accent: #4f46e5;
+  }
+
+  body[data-theme="dark"] {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+  }
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-family: "Segoe UI", sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  body[data-theme="dark"] .navbar {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    border-color: #374151;
+  }
+
+  .navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .brand {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-light);
+    border: 1px solid var(--accent);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .nav-btn:hover {
+    background-color: var(--accent);
+    color: white;
+  }
+
+  body[data-theme="dark"] .nav-btn {
+    color: var(--text-dark);
+    border-color: var(--accent);
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .theme-toggle input[type="checkbox"] {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background-color: #d1d5db;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .theme-toggle input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+  }
+
+  .theme-toggle input[type="checkbox"]:checked {
+    background-color: var(--accent);
+  }
+
+  .theme-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
+  }
+
+  .navbar-spacer {
+    margin-top: 90px;
+  }
+
+  @media (max-width: 640px) {
+    .nav-right {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .navbar {
+      text-align: center;
+    }
+
+    .brand {
+      margin-bottom: 0.8rem;
+    }
+  }
+</style>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="brand">ASL Sign Translator</div>
+    <div class="nav-right">
+      <a href="{% url 'login' %}" class="nav-btn">Login</a>
+      <a href="{% url 'register' %}" class="nav-btn">Register</a>
+      <div class="theme-toggle">
+        <label for="themeSwitch">Dark Mode</label>
+        <input type="checkbox" id="themeSwitch">
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Spacer to avoid content hiding -->
+<div class="navbar-spacer"></div>
+
+<!-- Theme Toggle Script -->
+<script>
+  const toggle = document.getElementById('themeSwitch');
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  document.body.setAttribute('data-theme', currentTheme);
+  toggle.checked = currentTheme === 'dark';
+
+  toggle.addEventListener('change', () => {
+    const newTheme = toggle.checked ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+</script>
