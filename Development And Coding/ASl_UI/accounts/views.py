@@ -16,11 +16,21 @@ from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 )
 from django.urls import reverse_lazy
+from asl.models import AuditLog
+from asl.utils import log_user_activity  # If stored in a utils.py file
+
 
 
 @login_required
 def profile_view(request):
     user = request.user
+
+    # 📘 Log user activity: page visit
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Profile page"
+    )
 
     # Ensure profile exists
     if not hasattr(user, 'profile'):
@@ -39,7 +49,14 @@ def profile_view(request):
             profile.profile_picture = request.FILES.get('profile_picture')
             print("✅ Received profile_picture:", profile.profile_picture)
 
-        profile.save()  # ✅ don't skip this
+        profile.save()
+
+        # ✅ Log profile update action
+        log_user_activity(
+            request,
+            action="Profile Update",
+            description="Updated profile details"
+        )
 
         return redirect('profile')
 
@@ -87,14 +104,32 @@ def logout_view(request):
 
 def verify_email(request, token):
     profile = get_object_or_404(Profile, email_token=token)
+
+    # Use the associated user from the profile for logging
+    user = profile.user
+
     if not profile.is_verified:
         profile.is_verified = True
         profile.save()
         messages.success(request, 'Email verified successfully!')
+
+        # 🟢 Log the successful verification
+        log_user_activity(
+            request,
+            action="Email Verification",
+            description=f"User '{user.username}' verified their email successfully."
+        )
     else:
         messages.info(request, 'Email already verified.')
-    return redirect('login')
 
+        # 🔵 Log the already verified case
+        log_user_activity(
+            request,
+            action="Email Verification",
+            description=f"User '{user.username}' attempted to verify an already verified email."
+        )
+
+    return redirect('login')
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'auth/password_reset.html'
