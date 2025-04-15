@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
 
 class ASLPrediction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -39,10 +40,6 @@ class ASLSentenceGeneration(models.Model):
         return f"{self.user.username} - {self.generated_sentence[:30]}..."
 
 
-
-from django.db import models
-from django.contrib.auth.models import User
-
 class ASLVideoHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     input_text = models.TextField()
@@ -53,5 +50,15 @@ class ASLVideoHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     video_url = models.URLField()
 
+    # Optional additions
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.user.username} - {self.video_name}"
+
+    @property
+    def absolute_file_path(self):
+        from django.conf import settings
+        return os.path.join(settings.MEDIA_ROOT, 'asl_videos', self.video_name)
+
