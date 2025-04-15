@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User's ASL Video History</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+
+{% include 'partials/sidebar.html' %}
+
+<div class="content-area">
+  <header class="page-header">
+    <h2>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+      User's ASL Video History
+    </h2>
+  </header>
+
+  <div class="table-container">
+    <form method="get" class="filters">
+      <div>
+        <label for="dateFilter">Filter by Date:</label><br>
+        <input type="date" id="dateFilter" onchange="filterTable()">
+      </div>
+
+      <div>
+        <label for="rowsPerPage">Rows per Page:</label><br>
+        <select id="rowsPerPage" onchange="changeRowsPerPage()">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="searchInput">Search:</label><br>
+        <input type="text" id="searchInput" placeholder="Search input text..." onkeyup="filterTable()">
+      </div>
+
+      <button type="button" onclick="exportTableToCSV()">Export CSV</button>
+    </form>
+
+    <table id="videoTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+            <th>User</th>
+          <th>Input</th>
+          <th>Frames</th>
+          <th>Duration (s)</th>
+          <th>Size (KB)</th>
+          <th>Video</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for video in videos %}
+        <tr>
+          <td data-label="Date">{{ video.created_at|date:"Y-m-d H:i" }}</td>
+             <td>{{ video.user.first_name }} {{ video.user.last_name }}</td>
+          <td data-label="Input">{{ video.input_text }}</td>
+          <td data-label="Frames">{{ video.frame_count }}</td>
+          <td data-label="Duration">{{ video.video_duration_sec }}</td>
+          <td data-label="Size">{{ video.video_size_kb }}</td>
+          <td data-label="Video"><a href="{{ video.video_url }}" target="_blank">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pagination-controls">
+      <div>
+        <button onclick="prevPage()">Previous</button>
+        Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 20%;">
+        <button onclick="nextPage()">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/prediction_history.js' %}"></script>
+</body>
+</html>

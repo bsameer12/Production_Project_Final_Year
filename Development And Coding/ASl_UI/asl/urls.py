@@ -16,6 +16,8 @@ urlpatterns = [
     path("english-to-asl/", views.english_to_asl_view, name="english_to_asl"),
     path("generate-asl-video/", views.generate_asl_video, name="generate_asl_video"),
     path('asl-video-history/', views.asl_video_history, name='asl_video_history'),
+    path('admin-video-history/', views.admin_video_history_view, name='admin_video_history'),
+
 
 
 
