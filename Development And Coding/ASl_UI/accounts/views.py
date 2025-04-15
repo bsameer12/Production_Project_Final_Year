@@ -98,8 +98,9 @@ def verify_email(request, token):
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'auth/password_reset.html'
-    email_template_name = 'auth/password_reset_email.html'
-    subject_template_name = 'auth/password_reset_subject.txt'
+    email_template_name = 'auth/password_reset_email.txt'  # fallback plain text
+    html_email_template_name = 'auth/password_reset_email.html'  # ✅ key fix
+    subject_template_name = 'auth/password_reset_email.txt'
     success_url = reverse_lazy('password_reset_done')
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
