@@ -34,6 +34,12 @@
     <li><a href="{% url 'admin_user_history' %}"><i class="fas fa-clipboard-list"></i><span>Users Audit History</span></a></li>
     <li><a href="{% url 'admin_sentence_history' %}"><i class="fas fa-file-alt"></i><span>Users Sentence History</span></a></li>
     <li><a href="{% url 'admin_video_history' %}"><i class="fas fa-users"></i><span>User's Video History</span></a></li>
+    <li>
+  <a href="{% url 'admin_user_list' %}">
+    <i class="fas fa-user-shield"></i>
+    <span>Manage Users</span>
+  </a>
+</li>
     {% endif %}
 
     <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>

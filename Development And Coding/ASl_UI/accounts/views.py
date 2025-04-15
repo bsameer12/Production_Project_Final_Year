@@ -215,3 +215,35 @@ def email_not_verified_view(request):
             return redirect('login')
 
     return render(request, 'email_not_verified.html', {'user': user})
+
+
+@login_required
+def admin_user_list_view(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied("You do not have permission to view this page.")
+
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited Admin Users Management Page"
+    )
+
+    users = User.objects.exclude(id=request.user.id).select_related('profile').order_by('username')
+    return render(request, 'admin_users.html', {'users': users})
+
+
+@login_required
+def delete_user_view(request, user_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied("Only admins can delete users.")
+
+    user = get_object_or_404(User, id=user_id)
+
+    # Prevent deletion of self or other superusers
+    if user == request.user or user.is_superuser:
+        messages.error(request, "You cannot delete this user.")
+        return redirect('admin_user_list')
+
+    user.delete()
+    messages.success(request, "User deleted successfully.")
+    return redirect('admin_user_list')
