@@ -161,6 +161,15 @@ class CustomPasswordResetView(PasswordResetView):
 class CustomPasswordResetDoneView(PasswordResetDoneView):
     template_name = 'auth/password_reset_done.html'
 
+    def get(self, request, *args, **kwargs):
+        # 📝 Log password reset confirmation page visit
+        log_user_activity(
+            request,
+            action="Password Reset Email Sent",
+            description="Visited Password Reset Done page after submitting email"
+        )
+        return super().get(request, *args, **kwargs)
+    
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'auth/password_reset_confirm.html'
     success_url = reverse_lazy('password_reset_complete')
