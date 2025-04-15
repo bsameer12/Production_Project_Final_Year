@@ -2,6 +2,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from asl.models import AuditLog
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.conf import settings
 
 def log_user_activity(request, action, description):
     try:
@@ -25,17 +29,41 @@ def get_client_ip(request):
     return ip
 
 
-
 def send_verification_email(user, request):
     token = user.profile.email_token
     link = request.build_absolute_uri(reverse('verify_email', kwargs={'token': token}))
-    subject = 'Verify Your Email'
-    message = f'Hello {user.username},\n\nClick the link below to verify your email:\n{link}'
 
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False,
+    subject = 'Verify Your Email - ASL Sign Translator'
+
+    # Context for rendering the template
+    context = {
+        'user': user,
+        'verification_link': link,
+    }
+
+    # Render HTML content from template
+    html_content = render_to_string('emails/verify_email.html', context)
+
+    # Fallback plain text message
+    text_content = f"""
+Hello {user.get_full_name() or user.username},
+
+Please verify your email address for your ASL Sign Translator account.
+
+Click the link below:
+{link}
+
+If you didn’t request this, you can ignore this email.
+
+— ASL Sign Translator Support Team
+"""
+
+    # Create the email
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user.email],
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send(fail_silently=False)
