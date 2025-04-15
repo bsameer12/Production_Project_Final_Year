@@ -39,3 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+  }, 9000);

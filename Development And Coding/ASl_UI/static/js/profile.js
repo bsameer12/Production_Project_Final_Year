@@ -27,3 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
       label.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
     });
   });
+
+   setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+  }, 9000);

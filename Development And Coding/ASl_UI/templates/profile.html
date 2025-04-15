@@ -28,6 +28,12 @@
   <section class="form-section">
     <h3>Update Profile Info</h3>
     <form method="POST" enctype="multipart/form-data">
+    {% for message in messages %}
+  {% if 'profile' in message.tags %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endif %}
+{% endfor %}
+
       {% csrf_token %}
       <div class="profile-image-preview">
       <img src="{{profile.profile_picture.url}}" alt="Profile" width="100" style="border-radius: 50%;">
@@ -53,6 +59,11 @@
   <section class="form-section">
     <h3>Change Password</h3>
     <form method="POST" action="{% url 'password_change' %}">
+     {% for message in messages %}
+  {% if 'password' in message.tags %}
+    <div class="alert {{ message.tags }}">{{ message }}</div>
+  {% endif %}
+{% endfor %}
       {% csrf_token %}
       <label for="old_password">Old Password</label>
       <input type="password" name="old_password" required>
