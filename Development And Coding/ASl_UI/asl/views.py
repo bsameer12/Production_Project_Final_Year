@@ -257,10 +257,7 @@ def generate_asl_video(request):
         return JsonResponse({"error": "Invalid method"}, status=405)
 
     text = request.POST.get('text', '').upper().strip()
-    print(f"📥 Received text: '{text}'")
-
     if not text:
-        print("⚠️ No input received.")
         return JsonResponse({"error": "No input provided."}, status=400)
 
     images_path = os.path.join(settings.BASE_DIR, 'asl_images')
@@ -284,10 +281,8 @@ def generate_asl_video(request):
         if os.path.exists(img_path):
             img = cv2.imread(img_path)
             if img is None:
-                print(f"🚫 Unreadable image: {img_path}")
                 continue
 
-            # Store base size from the first valid image
             if base_width is None or base_height is None:
                 base_height, base_width = img.shape[:2]
             else:
@@ -298,14 +293,9 @@ def generate_asl_video(request):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
             for _ in range(frames_per_char):
-                frames.append(cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB))  # For imageio
-
-            print(f"✅ Processed '{char}' → {filename}")
-        else:
-            print(f"❌ Missing image for: '{char}'")
+                frames.append(cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB))
 
     if not frames:
-        print("❌ No valid frames to write.")
         return JsonResponse({"error": "No valid ASL characters found."}, status=400)
 
     filename = f"asl_{request.user.username}_{now().strftime('%Y%m%d%H%M%S')}.mp4"
@@ -317,13 +307,10 @@ def generate_asl_video(request):
                 writer.append_data(frame)
 
         video_url = f"{settings.MEDIA_URL}asl_videos/{filename}"
-        print(f"🎥 Saved video: {video_url}")
-
-        # Get video size and duration
         video_size_kb = round(os.path.getsize(video_path) / 1024, 2)
         video_duration = len(frames) / fps
 
-        # Save tracking info to DB
+        # Save video history
         ASLVideoHistory.objects.create(
             user=request.user,
             input_text=text,
@@ -334,12 +321,17 @@ def generate_asl_video(request):
             video_url=video_url
         )
 
+        # Audit log
+        log_user_activity(
+            request,
+            action="Generate ASL Video",
+            description=f"Generated video '{filename}' | Duration: {video_duration}s | Size: {video_size_kb}KB"
+        )
+
         return JsonResponse({"video_url": video_url})
 
     except Exception as e:
-        print(f"❌ Video writing error: {e}")
         return JsonResponse({"error": "Video writing failed."}, status=500)
-
 
 
 @login_required
