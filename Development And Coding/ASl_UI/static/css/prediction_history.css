@@ -1,10 +1,52 @@
- /* Filters & Table Side-by-side */
+/* ------------------------------
+  THEME VARIABLES
+------------------------------ */
+:root {
+  --bg-table: #ffffff;
+  --text-color: #333;
+  --filter-label: #333;
+  --input-bg: #ffffff;
+  --input-border: #ccc;
+  --btn-bg: #0d6efd;
+  --btn-hover: #084298;
+  --th-bg: #007bff;
+  --th-text: #ffffff;
+  --td-border: #e0e0e0;
+  --tr-odd: lightblue;
+  --tr-even: pink;
+  --mobile-row-bg: #fdfdfd;
+  --page-header-bg: #ffffff;
+  --page-header-border: #ddd;
+}
+
+body[data-theme="dark"] {
+  --bg-table: #1e293b;
+  --text-color: #e5e7eb;
+  --filter-label: #cbd5e1;
+  --input-bg: #334155;
+  --input-border: #475569;
+  --btn-bg: #6366f1;
+  --btn-hover: #4f46e5;
+  --th-bg: #4f46e5;
+  --th-text: #ffffff;
+  --td-border: #334155;
+  --tr-odd: #374151;
+  --tr-even: #1f2937;
+  --mobile-row-bg: #273144;
+  --page-header-bg: #1f2937;
+  --page-header-border: #475569;
+}
+
+/* ------------------------------
+  FILTERS & TABLE
+------------------------------ */
 .table-container {
   margin: 1rem;
-  background: #fff;
+  background: var(--bg-table);
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   padding: 1rem;
+  color: var(--text-color);
 }
 
 .filters {
@@ -27,7 +69,7 @@
 .filters label {
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: var(--filter-label);
 }
 
 .filters input,
@@ -35,14 +77,16 @@
   padding: 0.5rem 0.75rem;
   font-size: 14px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-color);
 }
 
 .filters button {
   padding: 0.5rem 1rem;
   font-size: 14px;
   border-radius: 6px;
-  background-color: #0d6efd;
+  background-color: var(--btn-bg);
   color: white;
   border: none;
   cursor: pointer;
@@ -51,20 +95,8 @@
 }
 
 .filters button:hover {
-  background-color: #084298;
+  background-color: var(--btn-hover);
 }
-
-@media (max-width: 768px) {
-  .filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filters div {
-    width: 100%;
-  }
-}
-
 
 /* Table styling */
 table {
@@ -72,11 +104,12 @@ table {
   border-collapse: collapse;
   margin-top: 1rem;
   font-size: 14px;
+  color: var(--text-color);
 }
 
 th {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--th-bg);
+  color: var(--th-text);
   text-align: left;
   padding: 12px;
 }
@@ -84,15 +117,15 @@ th {
 td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--td-border);
 }
 
 tbody tr:nth-child(odd) {
-  background-color: lightblue;
+  background-color: var(--tr-odd);
 }
 
 tbody tr:nth-child(even) {
-  background-color: pink;
+  background-color: var(--tr-even);
 }
 
 /* Pagination */
@@ -111,13 +144,15 @@ tbody tr:nth-child(even) {
 .pagination-controls input[type='number'],
 .pagination-controls select {
   padding: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-color);
 }
 
 .pagination-controls button {
   padding: 6px 10px;
-  background: #0d6efd;
+  background: var(--btn-bg);
   color: white;
   border: none;
   border-radius: 6px;
@@ -125,24 +160,29 @@ tbody tr:nth-child(even) {
 }
 
 .pagination-controls button:hover {
-  background: #084298;
+  background: var(--btn-hover);
 }
 
-
+/* Header */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: var(--page-header-bg);
+  color: var(--text-color);
   padding: 1rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--page-header-border);
 }
 
-
+/* Responsive */
 @media (max-width: 768px) {
   .filters {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .filters div {
+    width: 100%;
   }
 
   .pagination-controls {
@@ -157,7 +197,7 @@ tbody tr:nth-child(even) {
   table tr {
     display: block;
     margin-bottom: 1rem;
-    background: #fdfdfd;
+    background: var(--mobile-row-bg);
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }

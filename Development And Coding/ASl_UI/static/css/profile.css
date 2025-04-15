@@ -1,67 +1,96 @@
+/* ------------------------------
+   THEME VARIABLES
+------------------------------ */
+:root {
+  --form-bg: #ffffff;
+  --form-text: #000000;
+  --input-border: #ccc;
+  --btn-bg: #333;
+  --btn-hover: #444;
+  --btn-text: #ffffff;
+  --image-border: #ccc;
+}
+
+body[data-theme="dark"] {
+  --form-bg: #1e293b;
+  --form-text: #f3f4f6;
+  --input-border: #475569;
+  --btn-bg: #4b5563;
+  --btn-hover: #6b7280;
+  --btn-text: #ffffff;
+  --image-border: #64748b;
+}
+
+/* ------------------------------
+   FORM SECTION
+------------------------------ */
 .form-section {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      max-width: 100%;
-      width: 90%;
-      margin: 2rem auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+  background: var(--form-bg);
+  color: var(--form-text);
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 100%;
+  width: 90%;
+  margin: 2rem auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 
-    .form-section h3 {
-      margin-top: 0;
-    }
+.form-section h3 {
+  margin-top: 0;
+}
 
-    .form-section label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: 500;
-    }
+.form-section label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 500;
+}
 
-    .form-section input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.3rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+.form-section input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  background: var(--form-bg);
+  color: var(--form-text);
+}
 
-    .form-section button {
-      margin-top: 1.5rem;
-      padding: 0.7rem 2rem;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.form-section button {
+  margin-top: 1.5rem;
+  padding: 0.7rem 2rem;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .form-section button:hover {
-      background: #444;
-    }
+.form-section button:hover {
+  background: var(--btn-hover);
+}
 
-    .profile-image-preview {
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+.profile-image-preview {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
-    .profile-image-preview img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ccc;
-    }
+.profile-image-preview img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--image-border);
+}
 
-    @media (max-width: 600px) {
-      .form-section {
-        padding: 1rem;
-      }
+@media (max-width: 600px) {
+  .form-section {
+    padding: 1rem;
+  }
 
-      .profile-image-preview img {
-        width: 60px;
-        height: 60px;
-      }
-    }
+  .profile-image-preview img {
+    width: 60px;
+    height: 60px;
+  }
+}
