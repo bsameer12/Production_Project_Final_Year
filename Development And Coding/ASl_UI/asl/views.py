@@ -348,6 +348,13 @@ def english_to_asl_view(request):
 
 @login_required
 def asl_video_history(request):
+    # Log audit for page visit
+    log_user_activity(
+        request,
+        action="Page Visit",
+        description="Visited ASL Video History page"
+    )
+
     user = request.user
     videos = ASLVideoHistory.objects.filter(user=user).order_by('-created_at')
     return render(request, 'asl_video_history.html', {'videos': videos})
