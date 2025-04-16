@@ -24,12 +24,6 @@ from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 
-
-
-
-
-
-
 @csrf_exempt
 @login_required
 def generate_sentence_view(request):
@@ -391,4 +385,18 @@ def delete_prediction_view(request, prediction_id):
 
     except Exception as e:
         logger.error(f"❌ Error deleting prediction: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
+
+
+@login_required
+def delete_audit_log_view(request, log_id):
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
+    try:
+        log = get_object_or_404(AuditLog, id=log_id)
+        log.delete()
+        return JsonResponse({'success': True, 'message': '✅ Log entry deleted successfully.'})
+    except Exception as e:
+        print(f"❌ DELETE ERROR: {str(e)}")
         return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
