@@ -55,20 +55,25 @@
     }
 
     function filterTable() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const date = document.getElementById('dateFilter').value;
-      const table = document.getElementById('predictionTable');
-      const rows = table.querySelectorAll('tbody tr');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const date = document.getElementById('dateFilter').value;
+  const table = document.getElementById('predictionTable');
+  const rows = table.querySelectorAll('tbody tr');
 
-      rows.forEach(row => {
-        const dateMatch = !date || row.children[0].textContent.includes(date);
-        const textMatch = [...row.children].some(td =>
-          td.textContent.toLowerCase().includes(search)
-        );
+  rows.forEach(row => {
+    const timestampCell = row.children[0].textContent.trim(); // e.g., "2025-04-16 10:32:45"
+    const rowDate = timestampCell.split(' ')[0]; // Extract "2025-04-16"
 
-        row.style.display = dateMatch && textMatch ? '' : 'none';
-      });
-    }
+    const dateMatch = !date || rowDate === date;
+
+    const textMatch = [...row.children].some(td =>
+      td.textContent.toLowerCase().includes(search)
+    );
+
+    row.style.display = dateMatch && textMatch ? '' : 'none';
+  });
+}
+
 
     function exportTableToCSV() {
       const table = document.getElementById('predictionTable');
