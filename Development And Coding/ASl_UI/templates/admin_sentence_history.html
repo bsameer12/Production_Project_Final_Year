@@ -59,14 +59,19 @@
           </tr>
         </thead>
         <tbody>
-          {% for entry in generations %}
-          <tr>
-             <td>{{ s.user.get_full_name|default:s.user.username }}</td>
-            <td data-label="Date">{{ entry.created_at|date:"Y-m-d H:i" }}</td>
-            <td data-label="Input Predictions">{{ entry.predictions|join:", " }}</td>
-            <td data-label="Generated Sentence">{{ entry.generated_sentence }}</td>
-          </tr>
-          {% endfor %}
+         {% for entry in sentences %}
+  <tr>
+    <td>{{ entry.user.get_full_name|default:entry.user.username }}</td>
+    <td data-label="Date">{{ entry.created_at|date:"Y-m-d H:i" }}</td>
+    <td data-label="Input Predictions">{{ entry.predictions|join:", " }}</td>
+    <td data-label="Generated Sentence">{{ entry.generated_sentence }}</td>
+  </tr>
+{% empty %}
+  <tr>
+    <td colspan="4">No sentence generation history found.</td>
+  </tr>
+{% endfor %}
+
         </tbody>
       </table>
 
