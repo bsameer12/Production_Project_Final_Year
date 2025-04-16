@@ -78,7 +78,7 @@ body {
 
 .floating-label-group {
   position: relative;
-  margin-bottom: 1.8rem;
+  margin-bottom: 2.5rem; /* more space to avoid overlap with error */
 }
 
 .floating-label-group input {
@@ -119,24 +119,28 @@ body {
 
 .floating-label-group input:focus + label,
 .floating-label-group input:not(:placeholder-shown) + label {
-  top: -0.5rem;
+  top: 0rem;
   font-size: 0.75rem;
   color: var(--input-focus);
 }
 
-.icon {
+.floating-label-group .icon {
   position: absolute;
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--icon-color);
   font-size: 1rem;
+  pointer-events: none;
+  z-index: 2;
 }
 
-.error {
+.floating-label-group small.error {
+  position: absolute;
+  bottom: -1.9rem;
+  left: 0;
+  font-size: 0.5rem;
   color: var(--error-color);
-  font-size: 0.8rem;
-  margin-top: 0.2rem;
   display: none;
 }
 
