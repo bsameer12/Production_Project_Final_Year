@@ -6,8 +6,8 @@
   <title>Admin: User Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
-    <link rel="stylesheet" href="{% static 'css/admin_user.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_user.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -16,12 +16,15 @@
   <div class="content-area">
     <header class="page-header">
       <h2>
-         <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+        <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
         Manage Users
       </h2>
     </header>
 
     <div class="table-container">
+      <!-- ✅ Delete message feedback area -->
+      <div id="deleteMessage" class="delete-message" style="display: none;"></div>
+
       <form method="get" class="filters">
         <div>
           <label for="rowsPerPage">Rows per Page:</label><br>
@@ -74,7 +77,9 @@
                 {% endif %}
               </td>
               <td data-label="Action">
-                <button class="delete-btn" onclick="confirmDelete('{{ user.username }}', '{{ user.id }}')">Delete</button>
+                <button class="delete-btn" onclick="confirmDelete('{{ user.username }}', '{% url 'delete_user' user.id %}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
               </td>
             </tr>
           {% endfor %}
@@ -82,21 +87,59 @@
       </table>
 
       <div class="pagination-controls">
-      <div>
-        <button onclick="prevPage()">Previous</button>
-        Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 20%;">
-        <button onclick="nextPage()">Next</button>
+        <div>
+          <button onclick="prevPage()">Previous</button>
+          Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 20%;">
+          <button onclick="nextPage()">Next</button>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
   <script src="{% static 'js/prediction_history.js' %}"></script>
   <script>
-    function confirmDelete(username, userId) {
-      if (confirm(`Are you sure you want to delete user: ${username}?`)) {
-        window.location.href = `/admin/users/delete/${userId}/`;
+   function confirmDelete(username, deleteUrl) {
+  if (confirm(`Are you sure you want to delete user: ${username}?`)) {
+    fetch(deleteUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json',
       }
+    })
+    .then(response => response.json())
+    .then(data => {
+      showDeleteMessage(data.success, data.message);
+      if (data.success) {
+        setTimeout(() => location.reload(), 1000);
+      }
+    })
+    .catch(() => {
+      showDeleteMessage(false, 'An error occurred while deleting the user.');
+    });
+  }
+}
+
+
+    function showDeleteMessage(success, message) {
+      const box = document.getElementById('deleteMessage');
+      box.className = `delete-message ${success ? 'success' : 'error'}`;
+      box.textContent = message;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 9000);
+    }
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(cookie => {
+          const cookieTrimmed = cookie.trim();
+          if (cookieTrimmed.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookieTrimmed.slice(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
     }
   </script>
 </body>

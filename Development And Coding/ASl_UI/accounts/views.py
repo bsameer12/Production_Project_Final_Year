@@ -18,6 +18,10 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import get_user_model
 from .utils import send_verification_email
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
 
 
 @login_required
@@ -244,15 +248,22 @@ def admin_user_list_view(request):
 @login_required
 def delete_user_view(request, user_id):
     if not request.user.is_superuser:
-        raise PermissionDenied("Only admins can delete users.")
+        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
 
     user = get_object_or_404(User, id=user_id)
 
-    # Prevent deletion of self or other superusers
-    if user == request.user or user.is_superuser:
-        messages.error(request, "You cannot delete this user.")
-        return redirect('admin_user_list')
+    if user == request.user:
+        return JsonResponse({'success': False, 'message': "You cannot delete yourself."}, status=400)
+
+    if user.is_superuser:
+        return JsonResponse({'success': False, 'message': "You cannot delete another admin."}, status=400)
 
     user.delete()
-    messages.success(request, "User deleted successfully.")
-    return redirect('admin_user_list')
+
+    log_user_activity(
+        request,
+        action="Delete",
+        description=f"Admin deleted user: {user.username}"
+    )
+
+    return JsonResponse({'success': True, 'message': '✅ User deleted successfully.'})
