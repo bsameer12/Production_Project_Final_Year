@@ -207,6 +207,7 @@ button[type="submit"]:hover {
 @media (max-width: 480px) {
   .register-card {
     padding: 1.5rem;
+    margin-top: 10%;
   }
 }
 
@@ -236,3 +237,44 @@ button[type="submit"]:hover {
   95% { opacity: 1; }
   100% { opacity: 0; display: none; }
 }
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Center the button row */
+.form-row.center {
+  justify-content: center;
+  align-items: center;
+}
+
+.form-row.center button {
+  max-width: 200px;
+}
+
+/* Tablet/Desktop: two columns per row */
+@media (min-width: 768px) {
+.container {
+    max-width: 700px; /* or 600px, 800px depending on your preference */
+  }
+  .form-row {
+    flex-direction: row;
+  }
+
+  .form-row .floating-label-group {
+    flex: 1;
+  }
+
+  .form-row.center button {
+    width: 100%;
+  }
+}
+
