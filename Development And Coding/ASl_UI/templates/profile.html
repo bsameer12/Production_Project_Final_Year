@@ -55,28 +55,30 @@
     </form>
   </section>
 
-  <!-- Change Password Form -->
   <section class="form-section">
-    <h3>Change Password</h3>
-    <form method="POST" action="{% url 'password_change' %}">
-     {% for message in messages %}
-  {% if 'password' in message.tags %}
-    <div class="alert {{ message.tags }}">{{ message }}</div>
-  {% endif %}
-{% endfor %}
-      {% csrf_token %}
-      <label for="old_password">Old Password</label>
-      <input type="password" name="old_password" required>
+      <h3>Change Password</h3>
+      <form method="POST">
+        {% csrf_token %}
+        {% for message in messages %}
+          {% if 'password' in message.tags %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
 
-      <label for="new_password1">New Password</label>
-      <input type="password" name="new_password1" required>
+        {{ password_form.non_field_errors }}
 
-      <label for="new_password2">Confirm New Password</label>
-      <input type="password" name="new_password2" required>
+        <label for="id_old_password">Old Password</label>
+        {{ password_form.old_password }}
 
-      <button type="submit">Change Password</button>
-    </form>
-  </section>
+        <label for="id_new_password1">New Password</label>
+        {{ password_form.new_password1 }}
+
+        <label for="id_new_password2">Confirm New Password</label>
+        {{ password_form.new_password2 }}
+
+        <button type="submit" name="change_password">Change Password</button>
+      </form>
+    </section>
   </div>
   <script src="{% static 'js/profile.js' %}"></script>
 </body>
