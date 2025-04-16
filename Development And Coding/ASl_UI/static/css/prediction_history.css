@@ -128,17 +128,26 @@ tbody tr:nth-child(even) {
   background-color: var(--tr-even);
 }
 
-/* Pagination */
+/* Pagination controls */
 .pagination-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1rem;
-  padding: 0rem;
-  border-radius: 0px;
-  background: transparent;
+  margin: 1rem 0;
+  padding: 0;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row-info {
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .pagination-controls input[type='number'],
@@ -187,7 +196,17 @@ tbody tr:nth-child(even) {
 
   .pagination-controls {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .pagination-buttons {
+    justify-content: center;
+  }
+
+  .row-info {
+    margin-top: 0.5rem;
   }
 
   table thead {
@@ -229,7 +248,7 @@ tbody tr:nth-child(even) {
   background-color: #c82333;
 }
 
- .delete-message {
+.delete-message {
   padding: 12px 18px;
   margin-bottom: 1rem;
   border-radius: 6px;

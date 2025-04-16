@@ -81,12 +81,13 @@
       </table>
 
       <div class="pagination-controls">
-        <div>
-          <button onclick="prevPage()">Previous</button>
-          Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 60px;">
-          <button onclick="nextPage()">Next</button>
-        </div>
-      </div>
+  <div class="pagination-buttons">
+    <button onclick="prevPage()">Previous</button>
+    Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 60px;">
+    <button onclick="nextPage()">Next</button>
+  </div>
+  <div id="rowInfo" class="row-info"></div>
+</div>
     </div>
   </div>
 <script>
