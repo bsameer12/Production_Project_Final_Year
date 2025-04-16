@@ -400,3 +400,17 @@ def delete_audit_log_view(request, log_id):
     except Exception as e:
         print(f"❌ DELETE ERROR: {str(e)}")
         return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
+
+
+@login_required
+def delete_sentence_view(request, sentence_id):
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
+    try:
+        sentence = get_object_or_404(ASLSentenceGeneration, id=sentence_id)
+        sentence.delete()
+        return JsonResponse({'success': True, 'message': '✅ Sentence entry deleted successfully.'})
+    except Exception as e:
+        print(f"❌ DELETE ERROR: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)

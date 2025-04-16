@@ -19,6 +19,8 @@ urlpatterns = [
     path('admin-video-history/', views.admin_video_history_view, name='admin_video_history'),
     path('delete-prediction/<int:prediction_id>/', views.delete_prediction_view, name='delete_prediction'),
     path('delete-audit-log/<int:log_id>/', views.delete_audit_log_view, name='delete_audit_log'),
+    path('delete-sentence/<int:sentence_id>/', views.delete_sentence_view, name='delete_sentence'),
+
 
 
 
