@@ -414,3 +414,17 @@ def delete_sentence_view(request, sentence_id):
     except Exception as e:
         print(f"❌ DELETE ERROR: {str(e)}")
         return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
+
+
+@login_required
+def delete_video_view(request, video_id):
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
+    try:
+        video = get_object_or_404(ASLVideoHistory, id=video_id)
+        video.delete()  # 💥 Permanently deletes the record from the DB
+        return JsonResponse({'success': True, 'message': '✅ Video record permanently deleted.'})
+    except Exception as e:
+        print(f"❌ DELETE ERROR: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
