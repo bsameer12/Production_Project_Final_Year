@@ -58,6 +58,7 @@
             <th>User's Action</th>
             <th>Description</th>
             <th>IP Address</th>
+            <th>User Agent</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -68,6 +69,7 @@
             <td data-label="Action">{{ log.action }}</td>
             <td data-label="Description">{{ log.description }}</td>
             <td data-label="IP Address">{{ log.ip_address|default:"N/A" }}</td>
+            <td data-label="User Agent">{{ log.user_agent|truncatechars:50 }}</td>
              <td>
     <button class="delete-btn" onclick="confirmDeleteLog({{ log.id }})">
       <i class="fas fa-trash"></i> Delete

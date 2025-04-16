@@ -217,7 +217,7 @@ def admin_user_history_view(request):
     )
 
     audit_logs = AuditLog.objects.exclude(user=request.user).select_related('user').order_by('-timestamp')
-    return render(request, 'user_history.html', {'predictions': audit_logs})
+    return render(request, 'admin_user_history.html', {'predictions': audit_logs})
 
 
 @login_required
@@ -371,7 +371,6 @@ def admin_video_history_view(request):
 
     return render(request, 'admin_video_history.html', {'videos': videos})
 
-
 @login_required
 def delete_prediction_view(request, prediction_id):
     try:
@@ -380,6 +379,12 @@ def delete_prediction_view(request, prediction_id):
 
         prediction = get_object_or_404(ASLPrediction, id=prediction_id)
         prediction.delete()
+
+        log_user_activity(
+            request,
+            action="Delete",
+            description=f"Deleted Prediction ID: {prediction_id}"
+        )
 
         return JsonResponse({'success': True, 'message': '✅ Prediction deleted successfully.'})
 
@@ -390,12 +395,19 @@ def delete_prediction_view(request, prediction_id):
 
 @login_required
 def delete_audit_log_view(request, log_id):
-    if not request.user.is_superuser:
-        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
-
     try:
+        if not request.user.is_superuser:
+            return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
         log = get_object_or_404(AuditLog, id=log_id)
         log.delete()
+
+        log_user_activity(
+            request,
+            action="Delete",
+            description=f"Deleted AuditLog ID: {log_id}"
+        )
+
         return JsonResponse({'success': True, 'message': '✅ Log entry deleted successfully.'})
     except Exception as e:
         print(f"❌ DELETE ERROR: {str(e)}")
@@ -404,12 +416,19 @@ def delete_audit_log_view(request, log_id):
 
 @login_required
 def delete_sentence_view(request, sentence_id):
-    if not request.user.is_superuser:
-        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
-
     try:
+        if not request.user.is_superuser:
+            return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
         sentence = get_object_or_404(ASLSentenceGeneration, id=sentence_id)
         sentence.delete()
+
+        log_user_activity(
+            request,
+            action="Delete",
+            description=f"Deleted Sentence ID: {sentence_id}"
+        )
+
         return JsonResponse({'success': True, 'message': '✅ Sentence entry deleted successfully.'})
     except Exception as e:
         print(f"❌ DELETE ERROR: {str(e)}")
@@ -418,12 +437,19 @@ def delete_sentence_view(request, sentence_id):
 
 @login_required
 def delete_video_view(request, video_id):
-    if not request.user.is_superuser:
-        return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
-
     try:
+        if not request.user.is_superuser:
+            return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
         video = get_object_or_404(ASLVideoHistory, id=video_id)
-        video.delete()  # 💥 Permanently deletes the record from the DB
+        video.delete()
+
+        log_user_activity(
+            request,
+            action="Delete",
+            description=f"Deleted Video History ID: {video_id}"
+        )
+
         return JsonResponse({'success': True, 'message': '✅ Video record permanently deleted.'})
     except Exception as e:
         print(f"❌ DELETE ERROR: {str(e)}")
