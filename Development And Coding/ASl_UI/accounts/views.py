@@ -74,6 +74,15 @@ def register_view(request):
                 extra_tags='register'
             )
             return redirect('login')
+        else:
+            # Pass all form errors to messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request,
+                        f"{form.fields[field].label if field in form.fields else field.capitalize()}: {error}",
+                        extra_tags='register'
+                    )
     else:
         form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
