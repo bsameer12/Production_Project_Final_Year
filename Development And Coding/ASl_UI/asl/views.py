@@ -18,6 +18,12 @@ import numpy as np
 import imageio
 from django.conf import settings
 from .models import ASLVideoHistory
+import logging
+from django.shortcuts import get_object_or_404
+
+
+logger = logging.getLogger(__name__)
+
 
 
 
@@ -370,3 +376,19 @@ def admin_video_history_view(request):
     videos = ASLVideoHistory.objects.exclude(user=request.user).select_related('user').order_by('-created_at')
 
     return render(request, 'admin_video_history.html', {'videos': videos})
+
+
+@login_required
+def delete_prediction_view(request, prediction_id):
+    try:
+        if not request.user.is_superuser:
+            return JsonResponse({'success': False, 'message': 'Permission denied.'}, status=403)
+
+        prediction = get_object_or_404(ASLPrediction, id=prediction_id)
+        prediction.delete()
+
+        return JsonResponse({'success': True, 'message': '✅ Prediction deleted successfully.'})
+
+    except Exception as e:
+        logger.error(f"❌ Error deleting prediction: {str(e)}")
+        return JsonResponse({'success': False, 'message': 'Internal server error while deleting.'}, status=500)
