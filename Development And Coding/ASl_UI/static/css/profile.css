@@ -1,13 +1,10 @@
-/* ------------------------------
-   THEME VARIABLES
------------------------------- */
 :root {
-  --form-bg: #ffffff;
-  --form-text: #000000;
+  --form-bg: #fff;
+  --form-text: #000;
   --input-border: #ccc;
   --btn-bg: #333;
-  --btn-hover: #444;
-  --btn-text: #ffffff;
+  --btn-hover: #555;
+  --btn-text: #fff;
   --image-border: #ccc;
 }
 
@@ -17,35 +14,31 @@ body[data-theme="dark"] {
   --input-border: #475569;
   --btn-bg: #4b5563;
   --btn-hover: #6b7280;
-  --btn-text: #ffffff;
+  --btn-text: #fff;
   --image-border: #64748b;
 }
-
-/* ------------------------------
-   FORM SECTION
------------------------------- */
 .form-section {
   background: var(--form-bg);
-  color: var(--form-text);
-  padding: 2rem;
   border-radius: 10px;
-  max-width: 100%;
-  width: 90%;
-  margin: 2rem auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .form-section h3 {
   margin-top: 0;
 }
 
-.form-section label {
+label {
   display: block;
   margin-top: 1rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.form-section input {
+input {
   width: 100%;
   padding: 0.6rem;
   margin-top: 0.3rem;
@@ -55,7 +48,7 @@ body[data-theme="dark"] {
   color: var(--form-text);
 }
 
-.form-section button {
+button {
   margin-top: 1.5rem;
   padding: 0.7rem 2rem;
   background: var(--btn-bg);
@@ -65,25 +58,68 @@ body[data-theme="dark"] {
   cursor: pointer;
 }
 
-.form-section button:hover {
+button:hover {
   background: var(--btn-hover);
-}
-
-.profile-image-preview {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .profile-image-preview img {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  object-fit: cover;
   border: 2px solid var(--image-border);
+  object-fit: cover;
 }
 
+.alert {
+  margin-top: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.alert.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.alert.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.password-strength {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.password-strength.weak {
+  color: red;
+}
+.password-strength.medium {
+  color: orange;
+}
+.password-strength.strong {
+  color: green;
+}
+
+.password-rules {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9rem;
+  color: #888;
+}
+.password-rules li.valid {
+  color: green;
+  font-weight: 600;
+}
+
+.input-error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
   .form-section {
     padding: 1rem;
@@ -93,30 +129,4 @@ body[data-theme="dark"] {
     width: 60px;
     height: 60px;
   }
-}
-
-.alert {
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  animation: fadeOut 30s forwards;
-}
-
-.alert.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.alert.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  95% { opacity: 1; }
-  100% { opacity: 0; display: none; }
 }

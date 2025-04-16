@@ -17,7 +17,9 @@
       <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
       <h2>English To ASL Dashboard</h2>
     </header>
-  <div id="form-area">
+  <div id="form-area" style=" margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 40px; width:90%; ">
     <form id="aslForm">
       {% csrf_token %}
       <label for="text">Enter English text:</label>
@@ -25,7 +27,7 @@
       <button type="submit">Generate ASL Video</button>
     </form>
 
-    <div id="previewSection" style="display:none;">
+    <div id="previewSection" style="display:none; height:50%;">
       <h3>Video Preview</h3>
       <video id="aslPreview" controls>
   <source id="aslSource" src="" type="video/mp4">

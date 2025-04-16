@@ -7,55 +7,51 @@
   <title>Profile</title>
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body>
+<body data-theme="light">
   <!-- Sidebar -->
-  {% include 'partials/sidebar.html' %}
+ {% include 'partials/sidebar.html' %}
 
 
   <!-- Page Content -->
   <div class="content-area">
       <header class="page-header">
-      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
-      <h2>Profile</h2>
+      <h2><button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+      Profile</h2>
     </header>
-    <!-- Update Profile Form -->
-  <section class="form-section">
-    <h3>Update Profile Info</h3>
-    <form method="POST" enctype="multipart/form-data">
-    {% for message in messages %}
-  {% if 'profile' in message.tags %}
-    <div class="alert {{ message.tags }}">{{ message }}</div>
-  {% endif %}
-{% endfor %}
 
-      {% csrf_token %}
-      <div class="profile-image-preview">
-      <img src="{{profile.profile_picture.url}}" alt="Profile" width="100" style="border-radius: 50%;">
-      </div>
+    <section class="form-section" style="margin-top: 20px;">
+      <h3>Update Profile Info</h3>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for message in messages %}
+          {% if 'profile' in message.tags %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
 
-      <label for="first_name">First Name</label>
-      <input type="text" name="first_name" value="{{ user.first_name }}">
+        <div class="profile-image-preview">
+          <img src="{{profile.profile_picture.url}}" alt="Profile">
+        </div>
 
-      <label for="last_name">Last Name</label>
-      <input type="text" name="last_name" value="{{ user.last_name }}">
+        <label for="first_name">First Name</label>
+        <input type="text" name="first_name" value="{{ user.first_name }}" required>
 
-      <label for="contact">Contact Number</label>
-      <input type="text" name="contact" value="{{user.profile.contact_number }}">
+        <label for="last_name">Last Name</label>
+        <input type="text" name="last_name" value="{{ user.last_name }}" required>
 
-      <label for="profile_image">Change Profile Image</label>
-      <input type="file" name="profile_picture">
+        <label for="contact">Contact Number</label>
+        <input type="text" name="contact" value="{{user.profile.contact_number}}">
 
-      <button type="submit">Update Profile</button>
-    </form>
-  </section>
+        <label for="profile_picture">Change Profile Image</label>
+        <input type="file" name="profile_picture">
 
-  <section class="form-section">
+        <button type="submit">Update Profile</button>
+      </form>
+    </section>
+
+    <section class="form-section">
       <h3>Change Password</h3>
       <form method="POST">
         {% csrf_token %}
@@ -72,6 +68,15 @@
 
         <label for="id_new_password1">New Password</label>
         {{ password_form.new_password1 }}
+        <div id="password-strength"></div>
+
+        <ul class="password-rules" style="margin-left: 5px; margin-top:20px;">
+          <li id="rule-length">✔ At least 8 characters</li>
+          <li id="rule-uppercase">✔ One uppercase letter</li>
+          <li id="rule-lowercase">✔ One lowercase letter</li>
+          <li id="rule-number">✔ One number</li>
+          <li id="rule-special">✔ One special character</li>
+        </ul>
 
         <label for="id_new_password2">Confirm New Password</label>
         {{ password_form.new_password2 }}
@@ -80,7 +85,7 @@
       </form>
     </section>
   </div>
+
   <script src="{% static 'js/profile.js' %}"></script>
 </body>
 </html>
-

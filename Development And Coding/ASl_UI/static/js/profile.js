@@ -1,33 +1,123 @@
-    function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const screenWidth = window.innerWidth;
+// Theme Toggle
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("themeSwitch");
+  const label = document.getElementById("themeLabel");
 
-  if (screenWidth <= 767) {
-    // Mobile: show/hide full sidebar
-    sidebar.classList.toggle('mobile-open');
-  } else {
-    // Desktop & Tablet: expand/collapse sidebar
-    sidebar.classList.toggle('collapsed');
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.body.setAttribute("data-theme", savedTheme);
+  toggle.checked = savedTheme === "dark";
+  label.textContent = savedTheme === "dark" ? "Dark Mode" : "Light Mode";
+
+  toggle.addEventListener("change", () => {
+    const theme = toggle.checked ? "dark" : "light";
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    label.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
+  });
+
+  // Auto-dismiss Django alert messages
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+  }, 9000);
+
+  // Live validation fields
+  const firstName = document.querySelector('input[name="first_name"]');
+  const lastName = document.querySelector('input[name="last_name"]');
+  const contact = document.querySelector('input[name="contact"]');
+  const password = document.getElementById('id_new_password1');
+  const rules = {
+    length: document.getElementById('rule-length'),
+    upper: document.getElementById('rule-uppercase'),
+    lower: document.getElementById('rule-lowercase'),
+    number: document.getElementById('rule-number'),
+    special: document.getElementById('rule-special'),
+  };
+  const strengthBox = document.getElementById('password-strength');
+
+  function showError(input, message) {
+    let error = input.parentNode.querySelector('.input-error');
+    if (!error) {
+      error = document.createElement('div');
+      error.className = 'input-error';
+      input.insertAdjacentElement('afterend', error);
+    }
+    error.textContent = message;
+    error.style.display = 'block';
   }
-}
 
-document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById("themeSwitch");
-    const label = document.getElementById("themeLabel");
+  function clearError(input) {
+    const error = input.parentNode.querySelector('.input-error');
+    if (error) {
+      error.textContent = '';
+      error.style.display = 'none';
+    }
+  }
 
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.body.setAttribute("data-theme", savedTheme);
-    toggle.checked = savedTheme === "dark";
-    label.textContent = savedTheme === "dark" ? "Dark Mode" : "Light Mode";
+  // Name Validation: Only letters and spaces
+  [firstName, lastName].forEach(field => {
+    field.addEventListener('input', () => {
+      const value = field.value.trim();
+      const pattern = /^[A-Za-z\s]+$/;
 
-    toggle.addEventListener("change", () => {
-      const theme = toggle.checked ? "dark" : "light";
-      document.body.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      label.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
+      if (!value) {
+        showError(field, 'This field is required.');
+      } else if (!pattern.test(value)) {
+        showError(field, 'Only alphabets and spaces allowed.');
+      } else {
+        clearError(field);
+      }
     });
   });
 
-   setTimeout(() => {
-    document.querySelectorAll('.alert').forEach(el => el.remove());
-  }, 9000);
+  // Contact number (optional, basic numeric check if not empty)
+  contact.addEventListener('input', () => {
+    const val = contact.value.trim();
+    if (val && !/^\d+$/.test(val)) {
+      showError(contact, 'Contact number must be digits only.');
+    } else {
+      clearError(contact);
+    }
+  });
+
+  // Password Strength Validation
+  password?.addEventListener('input', () => {
+    const val = password.value;
+    let score = 0;
+
+    const checks = [
+      { test: val.length >= 8, rule: rules.length },
+      { test: /[A-Z]/.test(val), rule: rules.upper },
+      { test: /[a-z]/.test(val), rule: rules.lower },
+      { test: /\d/.test(val), rule: rules.number },
+      { test: /[^A-Za-z0-9]/.test(val), rule: rules.special }
+    ];
+
+    checks.forEach(({ test, rule }) => {
+      if (test) {
+        rule.classList.add('valid');
+        score++;
+      } else {
+        rule.classList.remove('valid');
+      }
+    });
+
+    // Strength bar
+    strengthBox.className = 'password-strength';
+    if (score <= 2) {
+      strengthBox.classList.add('weak');
+      strengthBox.textContent = 'Weak';
+    } else if (score <= 4) {
+      strengthBox.classList.add('medium');
+      strengthBox.textContent = 'Medium';
+    } else {
+      strengthBox.classList.add('strong');
+      strengthBox.textContent = 'Strong';
+    }
+  });
+});
+
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle(window.innerWidth <= 767 ? 'mobile-open' : 'collapsed');
+}
