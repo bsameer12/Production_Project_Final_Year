@@ -1,24 +1,23 @@
-
-    document.getElementById('aslForm').addEventListener('submit', function(e) {
+document.getElementById('aslForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
   const formData = new FormData();
   formData.append('text', document.getElementById('text').value);
 
-  fetch("{% url 'generate_asl_video' %}", {
+  fetch(generateASLVideoURL, {
     method: 'POST',
-    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+    headers: { 'X-CSRFToken': csrfToken },
     body: formData
   })
   .then(res => res.json())
   .then(data => {
     if (data.video_url) {
       const video = document.getElementById('aslPreview');
-      const source = document.getElementById('aslSource');  // ✅ Use a static ID
+      const source = document.getElementById('aslSource');
 
       if (source) {
         source.src = data.video_url;
-        video.load();       // ⬅️ tells browser to reload the new video
+        video.load();
       } else {
         video.src = data.video_url;
       }

@@ -37,6 +37,11 @@
     </div>
   </div>
   </div>
+  <script>
+  const generateASLVideoURL = "{% url 'generate_asl_video' %}";
+  const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/english_to_asl.js' %}"></script>
   <script src="{% static 'js/english_to_asl.js' %}"></script>
   <script src="{% static 'js/profile.js' %}"></script>
 </body>
