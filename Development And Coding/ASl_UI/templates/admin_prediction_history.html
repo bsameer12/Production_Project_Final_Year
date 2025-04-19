@@ -21,7 +21,7 @@
       User Prediction History</h2>
     </header>
   <div class="table-container">
-    <form method="get" class="filters">
+   <form method="get" class="filters">
     <div>
     <label for="dateFilter">Filter by Date:</label><br>
     <input type="date" name="date" id="dateFilter" onchange="filterTable()">
@@ -48,8 +48,8 @@
     <table id="predictionTable">
       <thead>
         <tr>
-            <th>User</th>
           <th>Date</th>
+            <th>User</th>
           <th>Top 1</th>
           <th>Confidence</th>
           <th>Top 2</th>
@@ -62,8 +62,8 @@
       <tbody>
         {% for prediction in predictions %}
         <tr>
-            <td data-label="User">{{ prediction.user.first_name }} {{ prediction.user.last_name }}</td>
           <td data-label="Date">{{ prediction.created_at|date:"Y-m-d H:i" }}</td>
+            <td data-label="User">{{ prediction.user.first_name }} {{ prediction.user.last_name }}</td>
           <td data-label="Top 1">{{ prediction.top1_label }}</td>
           <td data-label="Conf.">{{ prediction.top1_confidence }}</td>
           <td data-label="Top 2">{{ prediction.top2_label }}</td>
