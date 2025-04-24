@@ -15,7 +15,6 @@
       {% csrf_token %}
       <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
 
-      {{ form.non_field_errors }}
     {% for message in messages %}
   {% if 'login' in message.tags %}
     <div class="alert {{ message.tags }}">{{ message }}</div>

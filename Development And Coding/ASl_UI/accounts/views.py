@@ -21,7 +21,12 @@ from .utils import send_verification_email
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-
+from .forms import ProfileForm, CustomPasswordChangeForm
+from .models import Profile
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
 
 @login_required
@@ -29,39 +34,45 @@ def profile_view(request):
     user = request.user
     log_user_activity(request, action="Page Visit", description="Visited Profile page")
 
-    if not hasattr(user, 'profile'):
-        Profile.objects.create(user=user)
+    # Ensure profile exists
+    profile, _ = Profile.objects.get_or_create(user=user)
 
-    profile = user.profile
-    password_form = PasswordChangeForm(user=user, data=request.POST or None)
+    # Bind our two forms
+    profile_form = ProfileForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=profile,
+        user=user
+    )
+    password_form = CustomPasswordChangeForm(user=user, data=request.POST or None)
 
     if request.method == 'POST':
-        # Check which form was submitted using a name
         if 'update_profile' in request.POST:
-            user.first_name = request.POST.get('first_name')
-            user.last_name = request.POST.get('last_name')
-            user.save()
-
-            profile.contact_number = request.POST.get('contact')
-            if request.FILES.get('profile_picture'):
-                profile.profile_picture = request.FILES.get('profile_picture')
-            profile.save()
-
-            messages.success(request, "Profile updated successfully!", extra_tags='profile')
-            log_user_activity(request, action="Profile Update", description="Updated profile details")
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile updated successfully!", extra_tags='profile')
+                log_user_activity(request, action="Profile Update", description="Updated profile details")
+                return redirect('profile')
+            else:
+                # field‐level errors will already be attached to profile_form
+                for field, errs in profile_form.errors.items():
+                    for err in errs:
+                        messages.error(request, f"{field.capitalize()}: {err}", extra_tags='profile')
 
         elif 'change_password' in request.POST:
             if password_form.is_valid():
                 password_form.save()
-                update_session_auth_hash(request, user)  # Keep user logged in
+                update_session_auth_hash(request, user)
                 messages.success(request, "Password changed successfully!", extra_tags='password')
                 log_user_activity(request, action="Password Changed", description="User changed their password")
+                return redirect('profile')
             else:
-                messages.error(request, "Password change failed. See errors below.", extra_tags='password')
+                for field, errs in password_form.errors.items():
+                    for err in errs:
+                        messages.error(request, f"{field.replace('_',' ').capitalize()}: {err}", extra_tags='password')
 
     return render(request, 'profile.html', {
-        'user': user,
-        'profile': profile,
+        'profile_form': profile_form,
         'password_form': password_form,
     })
 

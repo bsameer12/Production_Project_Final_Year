@@ -1,21 +1,24 @@
 // Theme Toggle
+
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.getElementById("themeSwitch");
   const label = document.getElementById("themeLabel");
 
+  // Apply saved theme
   const savedTheme = localStorage.getItem("theme") || "light";
   document.body.setAttribute("data-theme", savedTheme);
-  toggle.checked = savedTheme === "dark";
-  label.textContent = savedTheme === "dark" ? "Dark Mode" : "Light Mode";
+  if (toggle) toggle.checked = savedTheme === "dark";
+  if (label) label.textContent = savedTheme === "dark" ? "Dark Mode" : "Light Mode";
 
-  toggle.addEventListener("change", () => {
+  // Handle theme switch
+  toggle?.addEventListener("change", () => {
     const theme = toggle.checked ? "dark" : "light";
     document.body.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
     label.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
   });
 
-  // Auto-dismiss Django alert messages
+  // Auto-dismiss alerts
   setTimeout(() => {
     document.querySelectorAll('.alert').forEach(el => el.remove());
   }, 9000);
@@ -23,8 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Live validation fields
   const firstName = document.querySelector('input[name="first_name"]');
   const lastName = document.querySelector('input[name="last_name"]');
-  const contact = document.querySelector('input[name="contact"]');
+  const contact = document.querySelector('input[name="contact_number"]');
   const password = document.getElementById('id_new_password1');
+
   const rules = {
     length: document.getElementById('rule-length'),
     upper: document.getElementById('rule-uppercase'),
@@ -55,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Name Validation: Only letters and spaces
   [firstName, lastName].forEach(field => {
-    field.addEventListener('input', () => {
+    field?.addEventListener('input', () => {
       const value = field.value.trim();
       const pattern = /^[A-Za-z\s]+$/;
 
@@ -69,8 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Contact number (optional, basic numeric check if not empty)
-  contact.addEventListener('input', () => {
+  // Contact number (optional, numeric check if provided)
+  contact?.addEventListener('input', () => {
     const val = contact.value.trim();
     if (val && !/^\d+$/.test(val)) {
       showError(contact, 'Contact number must be digits only.');
@@ -93,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     checks.forEach(({ test, rule }) => {
+      if (!rule) return;
       if (test) {
         rule.classList.add('valid');
         score++;
@@ -101,23 +106,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Strength bar
-    strengthBox.className = 'password-strength';
-    if (score <= 2) {
-      strengthBox.classList.add('weak');
-      strengthBox.textContent = 'Weak';
-    } else if (score <= 4) {
-      strengthBox.classList.add('medium');
-      strengthBox.textContent = 'Medium';
-    } else {
-      strengthBox.classList.add('strong');
-      strengthBox.textContent = 'Strong';
+    // Update strength bar
+    if (strengthBox) {
+      strengthBox.className = 'password-strength';
+      if (score <= 2) {
+        strengthBox.classList.add('weak');
+        strengthBox.textContent = 'Weak';
+      } else if (score <= 4) {
+        strengthBox.classList.add('medium');
+        strengthBox.textContent = 'Medium';
+      } else {
+        strengthBox.classList.add('strong');
+        strengthBox.textContent = 'Strong';
+      }
     }
   });
 });
 
-
+// Sidebar toggle for responsive view
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle(window.innerWidth <= 767 ? 'mobile-open' : 'collapsed');
+  const isMobile = window.innerWidth <= 767;
+  sidebar.classList.toggle(isMobile ? 'mobile-open' : 'collapsed');
 }
