@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User History</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+<!-- Sidebar -->
+ {% include 'partials/sidebar.html' %}
+
+
+  <!-- Page Content -->
+  <div class="content-area">
+    <header class="page-header">
+      <h2>
+        <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+        User's History
+      </h2>
+    </header>
+
+    <div class="table-container">
+      <form method="get" class="filters">
+        <div>
+          <label for="dateFilter">Filter by Date:</label><br>
+          <input type="date" name="date" id="dateFilter" onchange="filterTable()">
+        </div>
+
+        <div>
+          <label for="rowsPerPage">Rows per Page:</label><br>
+          <select id="rowsPerPage" onchange="changeRowsPerPage()">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="searchInput">Search:</label><br>
+          <input type="text" name="search" id="searchInput" placeholder="Search..." onkeyup="filterTable()">
+        </div>
+
+        <div style="align-self: flex-end;">
+          <label>&nbsp;</label><br>
+          <button type="button" onclick="exportTableToCSV()">Export CSV</button>
+        </div>
+      </form>
+      <div id="deleteMessage" class="delete-message" style="display: none;"></div>
+      <table id="predictionTable">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User's Action</th>
+            <th>Description</th>
+            <th>IP Address</th>
+            <th>User Agent</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in predictions %}
+          <tr>
+            <td data-label="Timestamp">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+            <td data-label="Action">{{ log.action }}</td>
+            <td data-label="Description">{{ log.description }}</td>
+            <td data-label="IP Address">{{ log.ip_address|default:"N/A" }}</td>
+            <td data-label="User Agent">{{ log.user_agent|truncatechars:50 }}</td>
+             <td>
+    <button class="delete-btn" onclick="confirmDeleteLog({{ log.id }})">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="pagination-controls">
+  <div class="pagination-buttons">
+    <button onclick="prevPage()">Previous</button>
+    Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 60px;">
+    <button onclick="nextPage()">Next</button>
+  </div>
+  <div id="rowInfo" class="row-info"></div>
+</div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/prediction_history.js' %}"></script>
+<script src="{% static 'js/admin_user_history_delete.js' %}"></script>
+</body>
+</html>

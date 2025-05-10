@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | ASL Recognition</title>
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+{% include 'partials/navbar.html' %}
+  <div class="container" style="margin-top: 10%;">
+    <form method="post" class="register-card" id="registerForm" novalidate>
+  {% csrf_token %}
+  <h2><i class="fas fa-user-plus"></i> Register</h2>
+
+  {{ form.non_field_errors }}
+  {% for message in messages %}
+    {% if 'register' in message.tags %}
+      <div class="alert {{ message.tags }}">{{ message }}</div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="form-grid">
+    <div class="form-row">
+      <!-- Username -->
+      <div class="floating-label-group">
+        {{ form.username }}
+        <label for="id_username">Username</label>
+        <i class="fas fa-user icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Email -->
+      <div class="floating-label-group">
+        {{ form.email }}
+        <label for="id_email">Email</label>
+        <i class="fas fa-envelope icon"></i>
+        <small class="error"></small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- First Name -->
+      <div class="floating-label-group">
+        {{ form.first_name }}
+        <label for="id_first_name">First Name</label>
+        <i class="fas fa-id-card icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Last Name -->
+      <div class="floating-label-group">
+        {{ form.last_name }}
+        <label for="id_last_name">Last Name</label>
+        <i class="fas fa-id-card icon"></i>
+        <small class="error"></small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Contact -->
+      <div class="floating-label-group">
+        {{ form.contact_number }}
+        <label for="id_contact_number">Contact Number</label>
+        <i class="fas fa-phone icon"></i>
+        <small class="error"></small>
+      </div>
+
+      <!-- Password -->
+      <div class="floating-label-group">
+        {{ form.password1 }}
+        <label for="id_password1">Password</label>
+        <i class="fas fa-lock icon"></i>
+        <small class="error"></small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Confirm Password -->
+      <div class="floating-label-group" style="grid-column: span 2;">
+        {{ form.password2 }}
+        <label for="id_password2">Confirm Password</label>
+        <i class="fas fa-lock icon"></i>
+        <small class="error"></small>
+      </div>
+    </div>
+
+    <div class="form-row center">
+      <button type="submit" id="registerBtn">Register</button>
+      <div id="loader" class="loader" style="display: none;"></div>
+    </div>
+  </div>
+
+  <p class="redirect-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</form>
+
+  </div>
+
+  <script src="{% static 'js/register.js' %}"></script>
+</body>
+</html>

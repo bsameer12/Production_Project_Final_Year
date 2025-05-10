@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction History</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+<!-- Sidebar -->
+ {% include 'partials/sidebar.html' %}
+
+
+  <!-- Page Content -->
+  <div class="content-area">
+      <header class="page-header">
+      <h2><button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+      Prediction History</h2>
+    </header>
+  <div class="table-container">
+    <form method="get" class="filters">
+    <div>
+    <label for="dateFilter">Filter by Date:</label><br>
+    <input type="date" name="date" id="dateFilter" onchange="filterTable()">
+  </div>
+
+  <div>
+    <label for="rowsPerPage">Rows per Page:</label><br>
+    <select id="rowsPerPage" onchange="changeRowsPerPage()">
+      <option value="5">5</option>
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="searchInput">Search:</label><br>
+    <input type="text" name="search" id="searchInput" placeholder="Search label..." onkeyup="filterTable()">
+  </div>
+
+    <button type="button" onclick="exportTableToCSV()">Export CSV</button>
+  </form>
+    <table id="predictionTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Top 1</th>
+          <th>Confidence</th>
+          <th>Top 2</th>
+          <th>Confidence</th>
+          <th>Top 3</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prediction in predictions %}
+        <tr>
+          <td data-label="Date">{{ prediction.created_at|date:"Y-m-d H:i" }}</td>
+          <td data-label="Top 1">{{ prediction.top1_label }}</td>
+          <td data-label="Conf.">{{ prediction.top1_confidence }}</td>
+          <td data-label="Top 2">{{ prediction.top2_label }}</td>
+          <td data-label="Conf.">{{ prediction.top2_confidence }}</td>
+          <td data-label="Top 3">{{ prediction.top3_label }}</td>
+          <td data-label="Conf.">{{ prediction.top3_confidence }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="pagination-controls">
+  <div class="pagination-buttons">
+    <button onclick="prevPage()">Previous</button>
+    Page <input type="number" id="currentPage" value="1" min="1" onchange="goToPage()" style="width: 60px;">
+    <button onclick="nextPage()">Next</button>
+  </div>
+  <div id="rowInfo" class="row-info"></div>
+</div>
+
+  </div>
+  </div>
+<script src="{% static 'js/prediction_history.js' %}"></script>
+</body>
+</html>
+

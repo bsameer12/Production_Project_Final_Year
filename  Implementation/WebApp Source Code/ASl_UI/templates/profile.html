@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body data-theme="light">
+  <!-- Sidebar -->
+  {% include 'partials/sidebar.html' %}
+
+  <!-- Page Content -->
+  <div class="content-area">
+    <header class="page-header">
+      <h2>
+        <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+        Profile
+      </h2>
+    </header>
+
+    <section class="form-section" style="margin-top: 20px;">
+      <h3>Update Profile Info</h3>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for message in messages %}
+          {% if 'profile' in message.tags %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+
+        <div class="profile-image-preview">
+          <img src="{{ profile_form.instance.profile_picture.url }}" alt="Profile">
+        </div>
+
+        <div class="form-group">
+          {{ profile_form.first_name.label_tag }}
+          {{ profile_form.first_name }}
+        </div>
+        <div class="form-group">
+          {{ profile_form.last_name.label_tag }}
+          {{ profile_form.last_name }}
+        </div>
+        <div class="form-group">
+          {{ profile_form.contact_number.label_tag }}
+          {{ profile_form.contact_number }}
+        </div>
+        <div class="form-group">
+          {{ profile_form.profile_picture.label_tag }}
+          {{ profile_form.profile_picture }}
+        </div>
+
+        <button type="submit" name="update_profile">Update Profile</button>
+      </form>
+    </section>
+
+    <section class="form-section">
+      <h3>Change Password</h3>
+      <form method="POST">
+        {% csrf_token %}
+        {% for message in messages %}
+          {% if 'password' in message.tags %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+
+        {{ password_form.non_field_errors }}
+
+        <div class="form-group">
+          {{ password_form.old_password.label_tag }}
+          {{ password_form.old_password }}
+        </div>
+        <div class="form-group">
+          {{ password_form.new_password1.label_tag }}
+          {{ password_form.new_password1 }}
+          <div id="password-strength"></div>
+        </div>
+        <ul class="password-rules" style="margin-left: 5px; margin-top:20px;">
+          <li id="rule-length">✔ At least 8 characters</li>
+          <li id="rule-uppercase">✔ One uppercase letter</li>
+          <li id="rule-lowercase">✔ One lowercase letter</li>
+          <li id="rule-number">✔ One number</li>
+          <li id="rule-special">✔ One special character</li>
+        </ul>
+        <div class="form-group">
+          {{ password_form.new_password2.label_tag }}
+          {{ password_form.new_password2 }}
+        </div>
+
+        <button type="submit" name="change_password">Change Password</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="{% static 'js/profile.js' %}"></script>
+</body>
+</html>

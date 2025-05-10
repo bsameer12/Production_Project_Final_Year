@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English To ASL</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+   <link rel="stylesheet" href="{% static 'css/english_to_asl.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+
+  {% include 'partials/sidebar.html' %}
+  <div class="content-area">
+      <header class="page-header">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background: none; color: black;">☰</button>
+      <h2>English To ASL Dashboard</h2>
+    </header>
+  <div id="form-area" style=" margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 40px; width:90%; ">
+    <form id="aslForm">
+      {% csrf_token %}
+      <label for="text">Enter English text:</label>
+      <textarea name="text" id="text" placeholder="Type something..."></textarea>
+      <button type="submit">Generate ASL Video</button>
+    </form>
+
+    <div id="previewSection" style="display:none; height:50%;">
+      <h3>Video Preview</h3>
+      <video id="aslPreview" controls>
+  <source id="aslSource" src="" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+      <a id="downloadLink" href="#" download>Download ASL Video</a>
+    </div>
+  </div>
+  </div>
+  <script>
+  const generateASLVideoURL = "{% url 'generate_asl_video' %}";
+  const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/english_to_asl.js' %}"></script>
+  <script src="{% static 'js/english_to_asl.js' %}"></script>
+  <script src="{% static 'js/profile.js' %}"></script>
+</body>
+</html>
+

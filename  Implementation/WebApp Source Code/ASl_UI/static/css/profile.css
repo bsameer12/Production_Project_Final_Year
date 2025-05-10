@@ -1,0 +1,132 @@
+:root {
+  --form-bg: #fff;
+  --form-text: #000;
+  --input-border: #ccc;
+  --btn-bg: #333;
+  --btn-hover: #555;
+  --btn-text: #fff;
+  --image-border: #ccc;
+}
+
+body[data-theme="dark"] {
+  --form-bg: #1e293b;
+  --form-text: #f3f4f6;
+  --input-border: #475569;
+  --btn-bg: #4b5563;
+  --btn-hover: #6b7280;
+  --btn-text: #fff;
+  --image-border: #64748b;
+}
+.form-section {
+  background: var(--form-bg);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.form-section h3 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  background: var(--form-bg);
+  color: var(--form-text);
+}
+
+button {
+  margin-top: 1.5rem;
+  padding: 0.7rem 2rem;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--btn-hover);
+}
+
+.profile-image-preview img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--image-border);
+  object-fit: cover;
+}
+
+.alert {
+  margin-top: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.alert.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.alert.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.password-strength {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.password-strength.weak {
+  color: red;
+}
+.password-strength.medium {
+  color: orange;
+}
+.password-strength.strong {
+  color: green;
+}
+
+.password-rules {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9rem;
+  color: #888;
+}
+.password-rules li.valid {
+  color: green;
+  font-weight: 600;
+}
+
+.input-error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-section {
+    padding: 1rem;
+  }
+
+  .profile-image-preview img {
+    width: 60px;
+    height: 60px;
+  }
+}

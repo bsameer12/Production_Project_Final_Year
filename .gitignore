@@ -1,2 +1,8 @@
-/Development\ And\ Coding/ASL\(American_Sign_Language\)_Alphabet_Dataset
-Development And Coding/ASl_UI/venv/lib/python3.10/site-packages/tensorflow/libtensorflow_cc.2.dylib
+# Ignore the ASL Alphabet Dataset directory
+Implementation/ASL(American_Sign_Language)_Alphabet_Dataset
+
+# Ignore the specific TensorFlow library file
+Implementation/WebApp\ Source\ Code/ASl_UI/venv/lib/python3.10/site-packages/tensorflow/libtensorflow_cc.2.dylib
+
+/ Implementation/ASL(American_Sign_Language)_Alphabet_Dataset
+ Implementation/WebApp Source Code/ASl_UI/venv/lib/python3.10/site-packages/tensorflow/libtensorflow_cc.2.dylib
